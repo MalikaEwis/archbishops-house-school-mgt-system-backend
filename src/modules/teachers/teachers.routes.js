@@ -1,24 +1,102 @@
 'use strict';
 
-const { Router } = require('express');
-const teachersController = require('./teachers.controller');
-const asyncHandler = require('../../shared/utils/asyncHandler');
+const { Router }     = require('express');
+const ctrl           = require('./teachers.controller');
+const authenticate   = require('../../shared/middleware/authenticate');
+const authorize      = require('../../shared/middleware/authorize');
+const schoolFilter   = require('../../shared/middleware/schoolFilter');
+const asyncHandler   = require('../../shared/utils/asyncHandler');
+const { ROLE_GROUPS } = require('../../shared/constants/roles');
 
 const router = Router();
 
-// GET  /api/teachers
-router.get('/', asyncHandler(teachersController.getAll));
+// ── Global guards: every teacher route requires auth + school filter ──────────
+router.use(authenticate);
+router.use(schoolFilter);
 
-// GET  /api/teachers/:id
-router.get('/:id', asyncHandler(teachersController.getOne));
+// ─────────────────────────────────────────────────────────────────────────────
+// Removal-request sub-routes  (MUST be declared before /:id to avoid conflicts)
+// ─────────────────────────────────────────────────────────────────────────────
 
-// POST /api/teachers
-router.post('/', asyncHandler(teachersController.create));
+// GET  /api/teachers/removal-requests
+router.get(
+  '/removal-requests',
+  authorize(...ROLE_GROUPS.CAN_WRITE),
+  asyncHandler(ctrl.getRemovalRequests),
+);
 
-// PATCH /api/teachers/:id
-router.patch('/:id', asyncHandler(teachersController.update));
+// POST /api/teachers/removal-requests/:requestId/approve
+router.post(
+  '/removal-requests/:requestId/approve',
+  authorize(...ROLE_GROUPS.CAN_WRITE),
+  asyncHandler(ctrl.approveRemoval),
+);
 
-// DELETE /api/teachers/:id  (clears fields, preserves TIN – FR-19)
-router.delete('/:id', asyncHandler(teachersController.remove));
+// POST /api/teachers/removal-requests/:requestId/reject
+router.post(
+  '/removal-requests/:requestId/reject',
+  authorize(...ROLE_GROUPS.CAN_WRITE),
+  asyncHandler(ctrl.rejectRemoval),
+);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Collection routes
+// ─────────────────────────────────────────────────────────────────────────────
+
+// GET  /api/teachers  — all roles; filtering enforced by schoolFilter middleware
+router.get(
+  '/',
+  authorize(...ROLE_GROUPS.ALL),
+  asyncHandler(ctrl.getAll),
+);
+
+// POST /api/teachers  — admin only
+router.post(
+  '/',
+  authorize(...ROLE_GROUPS.CAN_WRITE),
+  asyncHandler(ctrl.create),
+);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Single-resource routes
+// ─────────────────────────────────────────────────────────────────────────────
+
+// GET  /api/teachers/:id  — all roles; school boundary enforced in service
+router.get(
+  '/:id',
+  authorize(...ROLE_GROUPS.ALL),
+  asyncHandler(ctrl.getOne),
+);
+
+// PATCH /api/teachers/:id  — admin only
+router.patch(
+  '/:id',
+  authorize(...ROLE_GROUPS.CAN_WRITE),
+  asyncHandler(ctrl.update),
+);
+
+// DELETE /api/teachers/:id
+// Intentionally blocked with a descriptive 400 — use the removal-request workflow.
+router.delete(
+  '/:id',
+  authorize(...ROLE_GROUPS.CAN_WRITE),
+  asyncHandler(ctrl.remove),
+);
+
+// PUT /api/teachers/:id/profile-picture  — admin only
+// Note: multer runs inside the controller (not as express middleware here)
+// so that AppError handling is consistent with the rest of the error pipeline.
+router.put(
+  '/:id/profile-picture',
+  authorize(...ROLE_GROUPS.CAN_WRITE),
+  asyncHandler(ctrl.uploadProfilePicture),
+);
+
+// POST /api/teachers/:id/removal-request  — admin A initiates removal (FR-20)
+router.post(
+  '/:id/removal-request',
+  authorize(...ROLE_GROUPS.CAN_WRITE),
+  asyncHandler(ctrl.requestRemoval),
+);
 
 module.exports = router;

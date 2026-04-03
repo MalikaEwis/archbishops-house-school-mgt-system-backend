@@ -159,6 +159,10 @@ CREATE TABLE IF NOT EXISTS private_school_teachers (
     selection_test_attempt2     ENUM('Pass','Fail') NULL,
     selection_test_attempt3     ENUM('Pass','Fail') NULL,
 
+    -- ── Profile Picture ──────────────────────────────────────
+    -- Relative path under the uploads/ directory  (FR-30)
+    profile_picture_path        VARCHAR(500)    NULL,
+
     -- ── Relationships ─────────────────────────────────────────
     school_id                   INT UNSIGNED    NOT NULL,
 

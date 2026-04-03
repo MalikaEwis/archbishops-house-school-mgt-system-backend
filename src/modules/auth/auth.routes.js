@@ -1,15 +1,21 @@
 'use strict';
 
-const { Router } = require('express');
+const { Router }   = require('express');
 const authController = require('./auth.controller');
-const asyncHandler = require('../../shared/utils/asyncHandler');
+const authenticate   = require('../../shared/middleware/authenticate');
+const asyncHandler   = require('../../shared/utils/asyncHandler');
 
 const router = Router();
 
+// ── Public routes (no token required) ────────────────────────
 // POST /api/auth/login
 router.post('/login', asyncHandler(authController.login));
 
-// POST /api/auth/logout
-router.post('/logout', asyncHandler(authController.logout));
+// ── Protected routes ──────────────────────────────────────────
+// POST /api/auth/logout  (authenticate confirms a valid session)
+router.post('/logout', authenticate, asyncHandler(authController.logout));
+
+// GET  /api/auth/me
+router.get('/me', authenticate, asyncHandler(authController.getMe));
 
 module.exports = router;
