@@ -7,6 +7,7 @@ const path = require('path');
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GET /api/teachers
+// Query params: schoolId, tin, name, category, page, limit
 // ─────────────────────────────────────────────────────────────────────────────
 async function getAll(req, res) {
   const filters = {
@@ -20,8 +21,20 @@ async function getAll(req, res) {
     category: req.query.category ?? null,
   };
 
-  const teachers = await teachersService.findAll(filters);
-  return sendSuccess(res, teachers);
+  const result = await teachersService.findAll(filters, {
+    page:  req.query.page,
+    limit: req.query.limit,
+  });
+
+  return sendSuccess(res, {
+    items: result.items,
+    pagination: {
+      total:      result.total,
+      page:       result.page,
+      limit:      result.limit,
+      totalPages: Math.ceil(result.total / result.limit),
+    },
+  });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

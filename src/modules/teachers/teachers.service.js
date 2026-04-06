@@ -117,15 +117,25 @@ function validateSchoolNumber(schoolNumber) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Returns all active teachers matching the filters.
+ * Returns a paginated list of active teachers matching the filters.
  * schoolFilter from middleware is already baked into filters.schoolId
  * for principal/HR roles — this function does not re-check roles.
  *
  * @param {{ schoolId, tin, name, category }} filters
- * @returns {Promise<object[]>}
+ * @param {{ page?: number, limit?: number }}  pagination
+ * @returns {Promise<{ items: object[], total: number, page: number, limit: number }>}
  */
-async function findAll(filters) {
-  return repo.findAll(filters);
+async function findAll(filters, pagination = {}) {
+  const page  = Math.max(1, Number(pagination.page)  || 1);
+  const limit = Math.min(100, Math.max(1, Number(pagination.limit) || 20));
+  const offset = (page - 1) * limit;
+
+  const [items, total] = await Promise.all([
+    repo.findAll(filters, { limit, offset }),
+    repo.countAll(filters),
+  ]);
+
+  return { items, total, page, limit };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -114,34 +114,68 @@ const BASE_SELECT = `
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Returns a list of active teachers, optionally filtered.
- *
+ * Shared WHERE builder for list queries.
  * @param {{ schoolId, tin, name, category }} filters
- * @returns {Promise<object[]>}
+ * @returns {{ clauses: string[], params: any[] }}
  */
-async function findAll(filters) {
-  const pool   = getPool();
-  const where  = ['t.is_active = 1'];
-  const params = [];
+function buildWhere(filters) {
+  const clauses = ['t.is_active = 1'];
+  const params  = [];
 
   if (filters.schoolId) {
-    where.push('t.school_id = ?');
+    clauses.push('t.school_id = ?');
     params.push(filters.schoolId);
   }
   if (filters.tin) {
-    where.push('t.tin = ?');
+    clauses.push('t.tin = ?');
     params.push(filters.tin);
   }
   if (filters.name) {
-    where.push('t.full_name LIKE ?');
+    clauses.push('t.full_name LIKE ?');
     params.push(`%${filters.name}%`);
   }
   if (filters.category) {
-    where.push('t.present_category = ?');
+    clauses.push('t.present_category = ?');
     params.push(filters.category);
   }
 
-  const sql = `${BASE_SELECT} WHERE ${where.join(' AND ')} ORDER BY t.full_name ASC`;
+  return { clauses, params };
+}
+
+/**
+ * Counts active teachers matching the given filters.
+ *
+ * @param {{ schoolId, tin, name, category }} filters
+ * @returns {Promise<number>}
+ */
+async function countAll(filters) {
+  const pool = getPool();
+  const { clauses, params } = buildWhere(filters);
+
+  const [rows] = await pool.execute(
+    `SELECT COUNT(*) AS total
+     FROM private_school_teachers t
+     WHERE ${clauses.join(' AND ')}`,
+    params,
+  );
+  return Number(rows[0].total);
+}
+
+/**
+ * Returns a paginated list of active teachers, optionally filtered.
+ *
+ * @param {{ schoolId, tin, name, category }} filters
+ * @param {{ limit: number, offset: number }} pagination
+ * @returns {Promise<object[]>}
+ */
+async function findAll(filters, { limit = 20, offset = 0 } = {}) {
+  const pool = getPool();
+  const { clauses, params } = buildWhere(filters);
+
+  // LIMIT and OFFSET appended last so positional params align
+  params.push(limit, offset);
+
+  const sql = `${BASE_SELECT} WHERE ${clauses.join(' AND ')} ORDER BY t.full_name ASC LIMIT ? OFFSET ?`;
   const [rows] = await pool.execute(sql, params);
   return rows;
 }
@@ -741,6 +775,7 @@ async function findRemovalRequests(filters = {}) {
 module.exports = {
   // Reads
   findAll,
+  countAll,
   findById,
 
   // TIN helpers
