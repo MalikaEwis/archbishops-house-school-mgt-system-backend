@@ -10,6 +10,7 @@
 
 const { getPool }  = require('../../config/database');
 const repo         = require('./teachers.repository');
+const tinService   = require('../tin/tin.service');
 const AppError     = require('../../shared/utils/AppError');
 
 // ─── Category upgrade rules (SRS FR-15) ──────────────────────────────────────
@@ -201,30 +202,30 @@ async function create(body) {
 
     let teacherId;
 
-    // ── FR-8: Check for a reusable vacant slot ────────────────────────────
-    const vacant = await repo.findVacantTinRow(
-      Number(body.tin_category),
-      Number(body.tin_school_number),
-    );
+    // ── TIN allocation (FR-8 reuse / FR-10 / FR-11 new) ──────────────────
+    // tinService.allocate() acquires a SELECT … FOR UPDATE lock on the
+    // tin_sequences row INSIDE this open transaction, making TIN numbering
+    // race-free for concurrent requests.
+    const allocation = await tinService.allocate({
+      tableType:    'Private',
+      category:     Number(body.tin_category),
+      schoolNumber: Number(body.tin_school_number),
+      conn,
+    });
 
-    if (vacant) {
-      // Reuse the existing row — TIN components stay unchanged
-      await repo.reactivateVacantRow(vacant.id, body, conn);
-      teacherId = vacant.id;
+    if (allocation.isReuse) {
+      // Reuse the existing row — TIN components stay unchanged (FR-8)
+      await repo.reactivateVacantRow(allocation.rowId, body, conn);
+      teacherId = allocation.rowId;
     } else {
-      // ── FR-10 / FR-11: Generate new TIN numbers ───────────────────────
-      const [noInSchool, noGlobal] = await Promise.all([
-        repo.nextTeacherNoInSchool(Number(body.tin_category), Number(body.tin_school_number)),
-        repo.nextTeacherNoGlobal(Number(body.tin_category)),
-      ]);
-
+      // Insert a brand-new row with the allocated numbers
       teacherId = await repo.insertTeacher(
         {
           ...body,
           tin_category:          Number(body.tin_category),
           tin_school_number:     Number(body.tin_school_number),
-          tin_teacher_no_school: noInSchool,
-          tin_teacher_no_global: noGlobal,
+          tin_teacher_no_school: allocation.tin_teacher_no_school,
+          tin_teacher_no_global: allocation.tin_teacher_no_global,
         },
         conn,
       );

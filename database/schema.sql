@@ -11,6 +11,28 @@ SET NAMES utf8mb4;
 SET time_zone = '+00:00';
 
 -- ============================================================
+-- TIN SEQUENCES  (must come before teacher tables)
+-- One row per (table_type, tin_category).
+-- Locked with SELECT … FOR UPDATE during every allocation.
+-- ============================================================
+CREATE TABLE IF NOT EXISTS tin_sequences (
+    table_type      ENUM('Private','International') NOT NULL,
+    tin_category    TINYINT UNSIGNED                NOT NULL
+                        COMMENT '1=Teacher  2=Clerical  3=Minor',
+    last_global     SMALLINT UNSIGNED               NOT NULL DEFAULT 0
+                        COMMENT 'Highest tin_teacher_no_global assigned so far',
+    updated_at      DATETIME                        NOT NULL
+                        DEFAULT CURRENT_TIMESTAMP
+                        ON UPDATE CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (table_type, tin_category)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT IGNORE INTO tin_sequences (table_type, tin_category, last_global) VALUES
+  ('Private',       1, 0), ('Private',       2, 0), ('Private',       3, 0),
+  ('International', 1, 0), ('International', 2, 0), ('International', 3, 0);
+
+-- ============================================================
 -- 0.  USERS  (referenced by removal-approval table)
 --     Full auth schema comes in Prompt 02.
 -- ============================================================
