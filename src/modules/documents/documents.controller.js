@@ -3,6 +3,7 @@
 const documentsService               = require('./documents.service');
 const { handleDocumentUpload }       = require('./documents.upload');
 const { sendSuccess, sendCreated, sendNoContent } = require('../../shared/utils/response');
+const audit = require('../../shared/utils/audit');
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GET /api/documents
@@ -35,6 +36,7 @@ async function upload(req, res) {
   await handleDocumentUpload(req, res);
 
   const doc = await documentsService.upload(req.body, req.file, req.user);
+  await audit(req, 'document.upload', 'document', doc.id, { form_code: doc.form_code, doc_category: doc.doc_category });
   return sendCreated(res, doc, 'Document uploaded successfully');
 }
 
@@ -47,6 +49,7 @@ async function replace(req, res) {
   await handleDocumentUpload(req, res);
 
   const doc = await documentsService.replace(req.params.id, req.file);
+  await audit(req, 'document.replace', 'document', Number(req.params.id));
   return sendSuccess(res, doc, 'Document replaced successfully');
 }
 
@@ -55,6 +58,7 @@ async function replace(req, res) {
 // ─────────────────────────────────────────────────────────────────────────────
 async function remove(req, res) {
   await documentsService.remove(req.params.id);
+  await audit(req, 'document.delete', 'document', Number(req.params.id));
   return sendNoContent(res);
 }
 

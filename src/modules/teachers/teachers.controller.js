@@ -3,7 +3,8 @@
 const teachersService = require('./teachers.service');
 const { handleProfilePictureUpload } = require('./teachers.upload');
 const { sendSuccess, sendCreated, sendNoContent } = require('../../shared/utils/response');
-const path = require('path');
+const audit = require('../../shared/utils/audit');
+const path  = require('path');
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GET /api/teachers
@@ -19,6 +20,9 @@ async function getAll(req, res) {
     tin:      req.query.tin      ?? null,
     name:     req.query.name     ?? null,
     category: req.query.category ?? null,
+    // isActive: omit → active only; 'all' → include removed; '0' → removed only
+    // Principal/HR are never allowed to see removed teachers.
+    isActive: req.schoolFilter ? undefined : (req.query.isActive ?? undefined),
   };
 
   const result = await teachersService.findAll(filters, {
@@ -50,6 +54,7 @@ async function getOne(req, res) {
 // ─────────────────────────────────────────────────────────────────────────────
 async function create(req, res) {
   const teacher = await teachersService.create(req.body);
+  await audit(req, 'teacher.create', 'teacher', teacher.id, { tin: teacher.tin });
   return sendCreated(res, teacher, 'Teacher created successfully');
 }
 
@@ -58,6 +63,7 @@ async function create(req, res) {
 // ─────────────────────────────────────────────────────────────────────────────
 async function update(req, res) {
   const teacher = await teachersService.update(req.params.id, req.body);
+  await audit(req, 'teacher.update', 'teacher', teacher.id, { fields: Object.keys(req.body) });
   return sendSuccess(res, teacher, 'Teacher updated successfully');
 }
 
@@ -90,6 +96,7 @@ async function requestRemoval(req, res) {
     req.body.reason,
     req.user.sub,
   );
+  await audit(req, 'teacher.removal.request', 'teacher', Number(req.params.id), { reason: req.body.reason });
   return sendCreated(res, result, result.message);
 }
 
@@ -99,6 +106,7 @@ async function approveRemoval(req, res) {
     req.params.requestId,
     req.user.sub,
   );
+  await audit(req, 'teacher.removal.approve', 'teacher_removal_approval', Number(req.params.requestId));
   return sendSuccess(res, result, result.message);
 }
 
@@ -108,6 +116,7 @@ async function rejectRemoval(req, res) {
     req.params.requestId,
     req.body.rejection_note,
   );
+  await audit(req, 'teacher.removal.reject', 'teacher_removal_approval', Number(req.params.requestId));
   return sendSuccess(res, result, result.message);
 }
 
@@ -120,6 +129,15 @@ async function getRemovalRequests(req, res) {
   };
   const requests = await teachersService.getRemovalRequests(filters);
   return sendSuccess(res, requests);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// POST /api/teachers/:id/upgrade-category  (admin only — FR-15)
+// ─────────────────────────────────────────────────────────────────────────────
+async function upgradeCategory(req, res) {
+  const teacher = await teachersService.upgradeCategory(req.params.id);
+  await audit(req, 'teacher.upgrade_category', 'teacher', teacher.id, { present_category: teacher.present_category });
+  return sendSuccess(res, teacher, `Category upgraded to ${teacher.present_category}`);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -136,6 +154,7 @@ module.exports = {
   create,
   update,
   uploadProfilePicture,
+  upgradeCategory,
   requestRemoval,
   approveRemoval,
   rejectRemoval,

@@ -98,6 +98,33 @@ function validateCategory(category) {
 }
 
 /**
+ * Enforces SRS training-flag rules:
+ *   - SSP status may only be set (non-default) for category-2 teachers.
+ *   - DCETT status may only be set (non-default) for category-3 teachers.
+ *
+ * "Non-default" means any value other than 'Not_Completed'.
+ *
+ * @param {number}      category   resolved present_category for this operation
+ * @param {string|null} sspStatus
+ * @param {string|null} dcettStatus
+ */
+function validateTrainingFlags(category, sspStatus, dcettStatus) {
+  const cat = Number(category);
+  if (sspStatus && sspStatus !== 'Not_Completed' && cat !== 2) {
+    throw new AppError(
+      'SSP status can only be recorded for Category 2 (Unregistered Permanent) teachers.',
+      400,
+    );
+  }
+  if (dcettStatus && dcettStatus !== 'Not_Completed' && cat !== 3) {
+    throw new AppError(
+      'DCETT status can only be recorded for Category 3 (Unregistered Training) teachers.',
+      400,
+    );
+  }
+}
+
+/**
  * Validates that the school number is within the Private school range (FR-7).
  *
  * @param {number} schoolNumber
@@ -130,9 +157,19 @@ async function findAll(filters, pagination = {}) {
   const limit = Math.min(100, Math.max(1, Number(pagination.limit) || 20));
   const offset = (page - 1) * limit;
 
+  // Pass isActive through to the repository unchanged so buildWhere can handle
+  // undefined (→ active only), 'all', '0', false, etc.
+  const repoFilters = {
+    schoolId: filters.schoolId,
+    tin:      filters.tin,
+    name:     filters.name,
+    category: filters.category,
+    isActive: filters.isActive,
+  };
+
   const [items, total] = await Promise.all([
-    repo.findAll(filters, { limit, offset }),
-    repo.countAll(filters),
+    repo.findAll(repoFilters, { limit, offset }),
+    repo.countAll(repoFilters),
   ]);
 
   return { items, total, page, limit };
@@ -200,6 +237,8 @@ async function create(body) {
 
   // Category 2 and 3 are the only initial assignments (FR-18: "assign category 2 or 3 initially")
   const cat = Number(body.present_category);
+
+  validateTrainingFlags(cat, body.ssp_status ?? null, body.dcett_status ?? null);
   if (cat === 1) {
     throw new AppError('Category 1 (Pensionable) cannot be assigned at onboarding. Start at 2 or 3.', 400);
   }
@@ -322,6 +361,19 @@ async function update(id, body) {
       body.selection_test_attempt1 ?? existing.selection_test_attempt1,
       body.selection_test_attempt2 ?? existing.selection_test_attempt2,
       body.selection_test_attempt3 ?? existing.selection_test_attempt3,
+    );
+  }
+
+  // Use the resolved category (after any upgrade) for training-flag validation
+  const resolvedCategory = body.present_category !== undefined
+    ? Number(body.present_category)
+    : existing.present_category;
+
+  if (body.ssp_status !== undefined || body.dcett_status !== undefined) {
+    validateTrainingFlags(
+      resolvedCategory,
+      body.ssp_status   ?? existing.ssp_status,
+      body.dcett_status ?? existing.dcett_status,
     );
   }
 
@@ -507,6 +559,41 @@ async function getRemovalRequests(filters) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// upgradeCategory  (FR-15: automatic upgrade triggered by admin)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Upgrades a teacher's present_category along the legal path (FR-15):
+ *   3 → 2  when ACPS 31 has been filed  (admin confirms)
+ *   2 → 1  after 6-month probation + interview  (admin confirms)
+ *
+ * Category 4 (Fixed Term) never upgrades.
+ *
+ * @param {number|string} id
+ * @returns {Promise<object>} updated teacher record
+ */
+async function upgradeCategory(id) {
+  const teacher = await repo.findById(Number(id));
+  if (!teacher)           throw new AppError('Teacher not found.', 404);
+  if (!teacher.is_active) throw new AppError('Cannot upgrade a removed teacher.', 409);
+
+  const from = teacher.present_category;
+  const legalNext = { 3: 2, 2: 1 };
+  const to = legalNext[from];
+
+  if (!to) {
+    throw new AppError(
+      `Category ${from} cannot be automatically upgraded. ` +
+      `Category 1 is the top grade; Category 4 (Fixed Term) never upgrades.`,
+      400,
+    );
+  }
+
+  await repo.updateTeacher(Number(id), { present_category: to });
+  return findById(Number(id), null);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // remove  (legacy direct-delete path — kept as thin wrapper for router compat)
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -528,6 +615,7 @@ module.exports = {
   create,
   update,
   updateProfilePicture,
+  upgradeCategory,
   remove,
   requestRemoval,
   approveRemoval,

@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * teachers.repository.js
@@ -18,7 +18,7 @@
  *   teacher_removal_approvals
  */
 
-const { getPool } = require('../../config/database');
+const { getPool } = require("../../config/database");
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SELECT helpers
@@ -119,8 +119,24 @@ const BASE_SELECT = `
  * @returns {{ clauses: string[], params: any[] }}
  */
 function buildWhere(filters) {
-  const clauses = ['t.is_active = 1'];
+  const clauses = [];
   const params  = [];
+
+  // isActive filter:
+  //   undefined / true / '1' → active only (default)
+  //   false / '0' / 0        → removed only
+  //   'all'                  → no restriction
+  if (filters.isActive === 'all') {
+    // include both active and removed — no clause added
+  } else if (
+    filters.isActive === false ||
+    filters.isActive === '0'   ||
+    filters.isActive === 0
+  ) {
+    clauses.push('t.is_active = 0');
+  } else {
+    clauses.push('t.is_active = 1');
+  }
 
   if (filters.schoolId) {
     clauses.push('t.school_id = ?');
@@ -136,10 +152,10 @@ function buildWhere(filters) {
   }
   if (filters.category) {
     clauses.push('t.present_category = ?');
-    params.push(filters.category);
+    params.push(Number(filters.category));
   }
 
-  return { clauses, params };
+  return { clauses: clauses.length ? clauses : ['1=1'], params };
 }
 
 /**
@@ -155,7 +171,7 @@ async function countAll(filters) {
   const [rows] = await pool.execute(
     `SELECT COUNT(*) AS total
      FROM private_school_teachers t
-     WHERE ${clauses.join(' AND ')}`,
+     WHERE ${clauses.join(" AND ")}`,
     params,
   );
   return Number(rows[0].total);
@@ -175,7 +191,7 @@ async function findAll(filters, { limit = 20, offset = 0 } = {}) {
   // LIMIT and OFFSET appended last so positional params align
   params.push(limit, offset);
 
-  const sql = `${BASE_SELECT} WHERE ${clauses.join(' AND ')} ORDER BY t.full_name ASC LIMIT ? OFFSET ?`;
+  const sql = `${BASE_SELECT} WHERE ${clauses.join(" AND ")} ORDER BY t.full_name ASC LIMIT ? OFFSET ?`;
   const [rows] = await pool.execute(sql, params);
   return rows;
 }
@@ -192,10 +208,9 @@ async function findAll(filters, { limit = 20, offset = 0 } = {}) {
  */
 async function findById(id) {
   const pool = getPool();
-  const [rows] = await pool.execute(
-    `${BASE_SELECT} WHERE t.id = ? LIMIT 1`,
-    [id],
-  );
+  const [rows] = await pool.execute(`${BASE_SELECT} WHERE t.id = ? LIMIT 1`, [
+    id,
+  ]);
   return rows[0];
 }
 
@@ -303,18 +318,18 @@ async function insertTeacher(data, conn) {
       data.nic,
       data.gender,
       data.date_of_birth,
-      data.religion           ?? null,
-      data.home_address       ?? null,
-      data.email              ?? null,
+      data.religion ?? null,
+      data.home_address ?? null,
+      data.email ?? null,
       data.date_of_first_appointment ?? null,
-      data.service_status     ?? 0,
-      data.confirmation_letter_status ?? 'Pending',
-      data.ssp_status         ?? 'Not_Completed',
-      data.dcett_status       ?? 'Not_Completed',
+      data.service_status ?? 0,
+      data.confirmation_letter_status ?? "Pending",
+      data.ssp_status ?? "Not_Completed",
+      data.dcett_status ?? "Not_Completed",
       data.selection_test_attempt1 ?? null,
       data.selection_test_attempt2 ?? null,
       data.selection_test_attempt3 ?? null,
-      data.profile_picture_path    ?? null,
+      data.profile_picture_path ?? null,
       data.school_id,
     ],
   );
@@ -362,18 +377,18 @@ async function reactivateVacantRow(id, data, conn) {
       data.nic,
       data.gender,
       data.date_of_birth,
-      data.religion           ?? null,
-      data.home_address       ?? null,
-      data.email              ?? null,
+      data.religion ?? null,
+      data.home_address ?? null,
+      data.email ?? null,
       data.date_of_first_appointment ?? null,
-      data.service_status     ?? 0,
-      data.confirmation_letter_status ?? 'Pending',
-      data.ssp_status         ?? 'Not_Completed',
-      data.dcett_status       ?? 'Not_Completed',
+      data.service_status ?? 0,
+      data.confirmation_letter_status ?? "Pending",
+      data.ssp_status ?? "Not_Completed",
+      data.dcett_status ?? "Not_Completed",
       data.selection_test_attempt1 ?? null,
       data.selection_test_attempt2 ?? null,
       data.selection_test_attempt3 ?? null,
-      data.profile_picture_path    ?? null,
+      data.profile_picture_path ?? null,
       data.school_id,
       id,
     ],
@@ -394,15 +409,27 @@ async function updateTeacher(id, data, conn) {
 
   // Build dynamic SET clause from provided fields
   const allowed = [
-    'present_category', 'full_name', 'nic', 'gender', 'date_of_birth',
-    'religion', 'home_address', 'email',
-    'date_of_first_appointment', 'service_status', 'confirmation_letter_status',
-    'ssp_status', 'dcett_status',
-    'selection_test_attempt1', 'selection_test_attempt2', 'selection_test_attempt3',
-    'profile_picture_path', 'school_id',
+    "present_category",
+    "full_name",
+    "nic",
+    "gender",
+    "date_of_birth",
+    "religion",
+    "home_address",
+    "email",
+    "date_of_first_appointment",
+    "service_status",
+    "confirmation_letter_status",
+    "ssp_status",
+    "dcett_status",
+    "selection_test_attempt1",
+    "selection_test_attempt2",
+    "selection_test_attempt3",
+    "profile_picture_path",
+    "school_id",
   ];
 
-  const sets   = [];
+  const sets = [];
   const params = [];
 
   for (const col of allowed) {
@@ -416,7 +443,7 @@ async function updateTeacher(id, data, conn) {
 
   params.push(id);
   const [result] = await db.execute(
-    `UPDATE private_school_teachers SET ${sets.join(', ')} WHERE id = ? AND is_active = 1`,
+    `UPDATE private_school_teachers SET ${sets.join(", ")} WHERE id = ? AND is_active = 1`,
     params,
   );
   return result.affectedRows > 0;
@@ -466,7 +493,7 @@ async function softDeleteTeacher(id, reason, conn) {
 async function getPhones(teacherId) {
   const pool = getPool();
   const [rows] = await pool.execute(
-    'SELECT id, phone_number, phone_type, is_primary FROM private_teacher_phones WHERE teacher_id = ? ORDER BY is_primary DESC',
+    "SELECT id, phone_number, phone_type, is_primary FROM private_teacher_phones WHERE teacher_id = ? ORDER BY is_primary DESC",
     [teacherId],
   );
   return rows;
@@ -482,13 +509,20 @@ async function getPhones(teacherId) {
  */
 async function setPhones(teacherId, phones, conn) {
   const db = conn || getPool();
-  await db.execute('DELETE FROM private_teacher_phones WHERE teacher_id = ?', [teacherId]);
+  await db.execute("DELETE FROM private_teacher_phones WHERE teacher_id = ?", [
+    teacherId,
+  ]);
 
   for (let i = 0; i < phones.length; i++) {
     const p = phones[i];
     await db.execute(
-      'INSERT INTO private_teacher_phones (teacher_id, phone_number, phone_type, is_primary) VALUES (?,?,?,?)',
-      [teacherId, p.phone_number, p.phone_type || 'Mobile', i === 0 ? 1 : (p.is_primary || 0)],
+      "INSERT INTO private_teacher_phones (teacher_id, phone_number, phone_type, is_primary) VALUES (?,?,?,?)",
+      [
+        teacherId,
+        p.phone_number,
+        p.phone_type || "Mobile",
+        i === 0 ? 1 : p.is_primary || 0,
+      ],
     );
   }
 }
@@ -537,19 +571,22 @@ async function upsertContract(teacherId, contract, conn) {
     [
       teacherId,
       contract.contract_6month_start ?? null,
-      contract.contract_6month_end   ?? null,
-      contract.contract_2nd_start    ?? null,
-      contract.contract_2nd_end      ?? null,
-      contract.contract_3rd_start    ?? null,
-      contract.contract_3rd_end      ?? null,
-      contract.contract_3rd_expiry   ?? null,
+      contract.contract_6month_end ?? null,
+      contract.contract_2nd_start ?? null,
+      contract.contract_2nd_end ?? null,
+      contract.contract_3rd_start ?? null,
+      contract.contract_3rd_end ?? null,
+      contract.contract_3rd_expiry ?? null,
     ],
   );
 }
 
 async function deleteContract(teacherId, conn) {
   const db = conn || getPool();
-  await db.execute('DELETE FROM private_teacher_contracts WHERE teacher_id = ?', [teacherId]);
+  await db.execute(
+    "DELETE FROM private_teacher_contracts WHERE teacher_id = ?",
+    [teacherId],
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -559,7 +596,7 @@ async function deleteContract(teacherId, conn) {
 async function getMediums(teacherId) {
   const pool = getPool();
   const [rows] = await pool.execute(
-    'SELECT medium FROM private_teacher_mediums WHERE teacher_id = ?',
+    "SELECT medium FROM private_teacher_mediums WHERE teacher_id = ?",
     [teacherId],
   );
   return rows.map((r) => r.medium);
@@ -567,10 +604,12 @@ async function getMediums(teacherId) {
 
 async function setMediums(teacherId, mediums, conn) {
   const db = conn || getPool();
-  await db.execute('DELETE FROM private_teacher_mediums WHERE teacher_id = ?', [teacherId]);
+  await db.execute("DELETE FROM private_teacher_mediums WHERE teacher_id = ?", [
+    teacherId,
+  ]);
   for (const medium of mediums) {
     await db.execute(
-      'INSERT IGNORE INTO private_teacher_mediums (teacher_id, medium) VALUES (?,?)',
+      "INSERT IGNORE INTO private_teacher_mediums (teacher_id, medium) VALUES (?,?)",
       [teacherId, medium],
     );
   }
@@ -579,7 +618,7 @@ async function setMediums(teacherId, mediums, conn) {
 async function getClassLevels(teacherId) {
   const pool = getPool();
   const [rows] = await pool.execute(
-    'SELECT class_level FROM private_teacher_class_levels WHERE teacher_id = ?',
+    "SELECT class_level FROM private_teacher_class_levels WHERE teacher_id = ?",
     [teacherId],
   );
   return rows.map((r) => r.class_level);
@@ -587,10 +626,13 @@ async function getClassLevels(teacherId) {
 
 async function setClassLevels(teacherId, levels, conn) {
   const db = conn || getPool();
-  await db.execute('DELETE FROM private_teacher_class_levels WHERE teacher_id = ?', [teacherId]);
+  await db.execute(
+    "DELETE FROM private_teacher_class_levels WHERE teacher_id = ?",
+    [teacherId],
+  );
   for (const level of levels) {
     await db.execute(
-      'INSERT IGNORE INTO private_teacher_class_levels (teacher_id, class_level) VALUES (?,?)',
+      "INSERT IGNORE INTO private_teacher_class_levels (teacher_id, class_level) VALUES (?,?)",
       [teacherId, level],
     );
   }
@@ -599,7 +641,7 @@ async function setClassLevels(teacherId, levels, conn) {
 async function getEducation(teacherId) {
   const pool = getPool();
   const [rows] = await pool.execute(
-    'SELECT qualification, other_detail FROM private_teacher_education WHERE teacher_id = ?',
+    "SELECT qualification, other_detail FROM private_teacher_education WHERE teacher_id = ?",
     [teacherId],
   );
   return rows;
@@ -607,10 +649,13 @@ async function getEducation(teacherId) {
 
 async function setEducation(teacherId, items, conn) {
   const db = conn || getPool();
-  await db.execute('DELETE FROM private_teacher_education WHERE teacher_id = ?', [teacherId]);
+  await db.execute(
+    "DELETE FROM private_teacher_education WHERE teacher_id = ?",
+    [teacherId],
+  );
   for (const item of items) {
     await db.execute(
-      'INSERT IGNORE INTO private_teacher_education (teacher_id, qualification, other_detail) VALUES (?,?,?)',
+      "INSERT IGNORE INTO private_teacher_education (teacher_id, qualification, other_detail) VALUES (?,?,?)",
       [teacherId, item.qualification, item.other_detail ?? null],
     );
   }
@@ -619,7 +664,7 @@ async function setEducation(teacherId, items, conn) {
 async function getProfessionalQualifications(teacherId) {
   const pool = getPool();
   const [rows] = await pool.execute(
-    'SELECT id, qualification FROM private_teacher_professional_qualifications WHERE teacher_id = ?',
+    "SELECT id, qualification FROM private_teacher_professional_qualifications WHERE teacher_id = ?",
     [teacherId],
   );
   return rows;
@@ -627,10 +672,13 @@ async function getProfessionalQualifications(teacherId) {
 
 async function setProfessionalQualifications(teacherId, items, conn) {
   const db = conn || getPool();
-  await db.execute('DELETE FROM private_teacher_professional_qualifications WHERE teacher_id = ?', [teacherId]);
+  await db.execute(
+    "DELETE FROM private_teacher_professional_qualifications WHERE teacher_id = ?",
+    [teacherId],
+  );
   for (const item of items) {
     await db.execute(
-      'INSERT INTO private_teacher_professional_qualifications (teacher_id, qualification) VALUES (?,?)',
+      "INSERT INTO private_teacher_professional_qualifications (teacher_id, qualification) VALUES (?,?)",
       [teacherId, item],
     );
   }
@@ -639,7 +687,7 @@ async function setProfessionalQualifications(teacherId, items, conn) {
 async function getSubjects(teacherId) {
   const pool = getPool();
   const [rows] = await pool.execute(
-    'SELECT subject FROM private_teacher_subjects WHERE teacher_id = ?',
+    "SELECT subject FROM private_teacher_subjects WHERE teacher_id = ?",
     [teacherId],
   );
   return rows.map((r) => r.subject);
@@ -647,10 +695,13 @@ async function getSubjects(teacherId) {
 
 async function setSubjects(teacherId, subjects, conn) {
   const db = conn || getPool();
-  await db.execute('DELETE FROM private_teacher_subjects WHERE teacher_id = ?', [teacherId]);
+  await db.execute(
+    "DELETE FROM private_teacher_subjects WHERE teacher_id = ?",
+    [teacherId],
+  );
   for (const subject of subjects) {
     await db.execute(
-      'INSERT IGNORE INTO private_teacher_subjects (teacher_id, subject) VALUES (?,?)',
+      "INSERT IGNORE INTO private_teacher_subjects (teacher_id, subject) VALUES (?,?)",
       [teacherId, subject],
     );
   }
@@ -662,14 +713,16 @@ async function setSubjects(teacherId, subjects, conn) {
 
 async function clearSatelliteData(teacherId, conn) {
   const db = conn || getPool();
-  // ON DELETE CASCADE handles phones automatically; others need explicit delete
+  // softDeleteTeacher does UPDATE not DELETE, so ON DELETE CASCADE never fires.
+  // Every satellite table must be explicitly cleared.
   await Promise.all([
-    db.execute('DELETE FROM private_teacher_contracts WHERE teacher_id = ?',                     [teacherId]),
-    db.execute('DELETE FROM private_teacher_mediums WHERE teacher_id = ?',                       [teacherId]),
-    db.execute('DELETE FROM private_teacher_class_levels WHERE teacher_id = ?',                  [teacherId]),
-    db.execute('DELETE FROM private_teacher_education WHERE teacher_id = ?',                     [teacherId]),
-    db.execute('DELETE FROM private_teacher_professional_qualifications WHERE teacher_id = ?',   [teacherId]),
-    db.execute('DELETE FROM private_teacher_subjects WHERE teacher_id = ?',                      [teacherId]),
+    db.execute('DELETE FROM private_teacher_phones                      WHERE teacher_id = ?', [teacherId]),
+    db.execute('DELETE FROM private_teacher_contracts                   WHERE teacher_id = ?', [teacherId]),
+    db.execute('DELETE FROM private_teacher_mediums                     WHERE teacher_id = ?', [teacherId]),
+    db.execute('DELETE FROM private_teacher_class_levels                WHERE teacher_id = ?', [teacherId]),
+    db.execute('DELETE FROM private_teacher_education                   WHERE teacher_id = ?', [teacherId]),
+    db.execute('DELETE FROM private_teacher_professional_qualifications WHERE teacher_id = ?', [teacherId]),
+    db.execute('DELETE FROM private_teacher_subjects                    WHERE teacher_id = ?', [teacherId]),
   ]);
 }
 
@@ -686,7 +739,12 @@ async function clearSatelliteData(teacherId, conn) {
  * @param {number} requestedBy  users.id
  * @returns {Promise<number>} insertId
  */
-async function createRemovalRequest(teacherId, teacherType, reason, requestedBy) {
+async function createRemovalRequest(
+  teacherId,
+  teacherType,
+  reason,
+  requestedBy,
+) {
   const pool = getPool();
   const [result] = await pool.execute(
     `INSERT INTO teacher_removal_approvals
@@ -756,15 +814,24 @@ async function rejectRemovalRequest(requestId, rejectionNote) {
  * @returns {Promise<object[]>}
  */
 async function findRemovalRequests(filters = {}) {
-  const pool  = getPool();
+  const pool = getPool();
   const where = [];
   const params = [];
 
-  if (filters.teacherId)   { where.push('teacher_id = ?');   params.push(filters.teacherId); }
-  if (filters.teacherType) { where.push('teacher_type = ?'); params.push(filters.teacherType); }
-  if (filters.status)      { where.push('status = ?');       params.push(filters.status); }
+  if (filters.teacherId) {
+    where.push("teacher_id = ?");
+    params.push(filters.teacherId);
+  }
+  if (filters.teacherType) {
+    where.push("teacher_type = ?");
+    params.push(filters.teacherType);
+  }
+  if (filters.status) {
+    where.push("status = ?");
+    params.push(filters.status);
+  }
 
-  const whereClause = where.length ? `WHERE ${where.join(' AND ')}` : '';
+  const whereClause = where.length ? `WHERE ${where.join(" AND ")}` : "";
   const [rows] = await pool.execute(
     `SELECT * FROM teacher_removal_approvals ${whereClause} ORDER BY requested_at DESC`,
     params,
@@ -799,11 +866,16 @@ module.exports = {
   deleteContract,
 
   // Qualifications
-  getMediums,          setMediums,
-  getClassLevels,      setClassLevels,
-  getEducation,        setEducation,
-  getProfessionalQualifications, setProfessionalQualifications,
-  getSubjects,         setSubjects,
+  getMediums,
+  setMediums,
+  getClassLevels,
+  setClassLevels,
+  getEducation,
+  setEducation,
+  getProfessionalQualifications,
+  setProfessionalQualifications,
+  getSubjects,
+  setSubjects,
 
   // Cleanup
   clearSatelliteData,

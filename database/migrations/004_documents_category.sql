@@ -20,7 +20,7 @@ ALTER TABLE documents
   MODIFY owner_id INT UNSIGNED NULL;
 
 -- 3. Indexes for common list-page filter combos
-ALTER TABLE documents
-  ADD INDEX IF NOT EXISTS idx_doc_category    (doc_category),
-  ADD INDEX IF NOT EXISTS idx_doc_admin_only  (admin_only),
-  ADD INDEX IF NOT EXISTS idx_doc_form_code   (form_code);
+-- idx_doc_form_code already exists in schema.sql; IF NOT EXISTS skips it safely.
+CREATE INDEX IF NOT EXISTS idx_doc_category   ON documents (doc_category);
+CREATE INDEX IF NOT EXISTS idx_doc_admin_only ON documents (admin_only);
+CREATE INDEX IF NOT EXISTS idx_doc_form_code  ON documents (form_code);

@@ -92,6 +92,13 @@ router.put(
   asyncHandler(ctrl.uploadProfilePicture),
 );
 
+// POST /api/teachers/:id/upgrade-category  — admin triggers FR-15 upgrade (3→2 or 2→1)
+router.post(
+  '/:id/upgrade-category',
+  authorize(...ROLE_GROUPS.CAN_WRITE),
+  asyncHandler(ctrl.upgradeCategory),
+);
+
 // POST /api/teachers/:id/removal-request  — admin A initiates removal (FR-20)
 router.post(
   '/:id/removal-request',

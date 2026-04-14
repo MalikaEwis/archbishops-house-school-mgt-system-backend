@@ -258,7 +258,12 @@ function parsePct(val) {
 }
 
 function makeStats() {
-  return { inserted: 0, skipped: 0, warned: 0 };
+  return { inserted: 0, skipped: 0, warned: 0, failures: [] };
+}
+
+/** CSV data row index → 1-based line number (header is line 1) */
+function rowLabel(idx) {
+  return `row ${idx + 2}`;
 }
 
 // ─── Module 1: Schools ────────────────────────────────────────────────────────
@@ -266,14 +271,17 @@ function makeStats() {
 async function importSchools(rows, conn, opts) {
   const stats = makeStats();
 
-  for (const row of rows) {
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
     try {
       const rawIndex = clean(row['Index'] || row['School Index'] || row['No'] || row['School No']);
       const name     = clean(row['School Name'] || row['Name']);
       const type     = clean(row['School Type'] || row['Type']) || 'Private';
 
       if (!rawIndex || !name) {
-        console.warn(`  [SKIP] Missing school_index or school_name`);
+        const msg = `[SKIP] ${rowLabel(i)} — Missing school_index or school_name`;
+        console.warn(`  ${msg}`);
+        stats.failures.push(msg);
         stats.skipped++;
         continue;
       }
@@ -313,11 +321,13 @@ async function importSchools(rows, conn, opts) {
         ],
       );
 
-      if (opts.verbose) console.log(`  [OK] School: ${name} (${idx})`);
+      if (opts.verbose) console.log(`  [OK] ${rowLabel(i)} School: ${name} (${idx})`);
       stats.inserted++;
 
     } catch (err) {
-      console.error(`  [ERROR] School: ${err.message}`);
+      const msg = `[ERROR] ${rowLabel(i)} School: ${err.message}`;
+      console.error(`  ${msg}`);
+      stats.failures.push(msg);
       stats.warned++;
     }
   }
@@ -330,13 +340,16 @@ async function importSchools(rows, conn, opts) {
 async function importPrivateTeachers(rows, conn, byIndex, opts) {
   const stats = makeStats();
 
-  for (const row of rows) {
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
     let tinStr;
     try {
       tinStr = clean(row['TIN'] || row['T.I.N'] || row['Tin']);
 
       if (!tinStr) {
-        console.warn(`  [SKIP] Missing TIN for: ${clean(row['Full Name'] || row['Name']) ?? 'unknown'}`);
+        const msg = `[SKIP] ${rowLabel(i)} — Missing TIN for: ${clean(row['Full Name'] || row['Name']) ?? 'unknown'}`;
+        console.warn(`  ${msg}`);
+        stats.failures.push(msg);
         stats.skipped++;
         continue;
       }
@@ -346,14 +359,18 @@ async function importPrivateTeachers(rows, conn, byIndex, opts) {
       const schoolId = byIndex[schoolNo];
 
       if (!schoolId) {
-        console.warn(`  [SKIP] No school for index "${schoolNo}" (TIN: ${tinStr})`);
+        const msg = `[SKIP] ${rowLabel(i)} — No school for index "${schoolNo}" (TIN: ${tinStr})`;
+        console.warn(`  ${msg}`);
+        stats.failures.push(msg);
         stats.skipped++;
         continue;
       }
 
       const nic = clean(row['NIC'] || row['Nic'] || row['N.I.C']);
       if (!nic) {
-        console.warn(`  [SKIP] Missing NIC (TIN: ${tinStr})`);
+        const msg = `[SKIP] ${rowLabel(i)} — Missing NIC (TIN: ${tinStr})`;
+        console.warn(`  ${msg}`);
+        stats.failures.push(msg);
         stats.skipped++;
         continue;
       }
@@ -392,7 +409,9 @@ async function importPrivateTeachers(rows, conn, byIndex, opts) {
       );
 
       if (result.affectedRows === 0) {
-        if (opts.verbose) console.log(`  [SKIP] Duplicate NIC ${nic}`);
+        const msg = `[SKIP] ${rowLabel(i)} — Duplicate NIC ${nic} (TIN: ${tinStr})`;
+        if (opts.verbose) console.log(`  ${msg}`);
+        stats.failures.push(msg);
         stats.skipped++;
         continue;
       }
@@ -484,11 +503,13 @@ async function importPrivateTeachers(rows, conn, byIndex, opts) {
         }
       }
 
-      if (opts.verbose) console.log(`  [OK] Teacher: ${clean(row['Full Name'])} (TIN: ${tinStr})`);
+      if (opts.verbose) console.log(`  [OK] ${rowLabel(i)} Teacher: ${clean(row['Full Name'])} (TIN: ${tinStr})`);
       stats.inserted++;
 
     } catch (err) {
-      console.error(`  [ERROR] Private teacher TIN=${tinStr ?? '?'}: ${err.message}`);
+      const msg = `[ERROR] ${rowLabel(i)} Private teacher TIN=${tinStr ?? '?'}: ${err.message}`;
+      console.error(`  ${msg}`);
+      stats.failures.push(msg);
       stats.warned++;
     }
   }
@@ -501,13 +522,16 @@ async function importPrivateTeachers(rows, conn, byIndex, opts) {
 async function importInternationalTeachers(rows, conn, byIndex, opts) {
   const stats = makeStats();
 
-  for (const row of rows) {
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
     let tinStr;
     try {
       tinStr = clean(row['TIN'] || row['T.I.N']);
 
       if (!tinStr) {
-        console.warn(`  [SKIP] Missing TIN for: ${clean(row['Full Name'] || row['Name']) ?? 'unknown'}`);
+        const msg = `[SKIP] ${rowLabel(i)} — Missing TIN for: ${clean(row['Full Name'] || row['Name']) ?? 'unknown'}`;
+        console.warn(`  ${msg}`);
+        stats.failures.push(msg);
         stats.skipped++;
         continue;
       }
@@ -517,14 +541,18 @@ async function importInternationalTeachers(rows, conn, byIndex, opts) {
       const schoolId = byIndex[schoolNo];
 
       if (!schoolId) {
-        console.warn(`  [SKIP] No school for index "${schoolNo}" (TIN: ${tinStr})`);
+        const msg = `[SKIP] ${rowLabel(i)} — No school for index "${schoolNo}" (TIN: ${tinStr})`;
+        console.warn(`  ${msg}`);
+        stats.failures.push(msg);
         stats.skipped++;
         continue;
       }
 
       const nic = clean(row['NIC'] || row['Nic']);
       if (!nic) {
-        console.warn(`  [SKIP] Missing NIC (TIN: ${tinStr})`);
+        const msg = `[SKIP] ${rowLabel(i)} — Missing NIC (TIN: ${tinStr})`;
+        console.warn(`  ${msg}`);
+        stats.failures.push(msg);
         stats.skipped++;
         continue;
       }
@@ -552,7 +580,9 @@ async function importInternationalTeachers(rows, conn, byIndex, opts) {
       );
 
       if (result.affectedRows === 0) {
-        if (opts.verbose) console.log(`  [SKIP] Duplicate NIC ${nic}`);
+        const msg = `[SKIP] ${rowLabel(i)} — Duplicate NIC ${nic} (TIN: ${tinStr})`;
+        if (opts.verbose) console.log(`  ${msg}`);
+        stats.failures.push(msg);
         stats.skipped++;
         continue;
       }
@@ -585,11 +615,13 @@ async function importInternationalTeachers(rows, conn, byIndex, opts) {
         );
       }
 
-      if (opts.verbose) console.log(`  [OK] Intl teacher: ${clean(row['Full Name'])} (TIN: ${tinStr})`);
+      if (opts.verbose) console.log(`  [OK] ${rowLabel(i)} Intl teacher: ${clean(row['Full Name'])} (TIN: ${tinStr})`);
       stats.inserted++;
 
     } catch (err) {
-      console.error(`  [ERROR] Intl teacher TIN=${tinStr ?? '?'}: ${err.message}`);
+      const msg = `[ERROR] ${rowLabel(i)} Intl teacher TIN=${tinStr ?? '?'}: ${err.message}`;
+      console.error(`  ${msg}`);
+      stats.failures.push(msg);
       stats.warned++;
     }
   }
@@ -602,13 +634,16 @@ async function importInternationalTeachers(rows, conn, byIndex, opts) {
 async function importRectors(rows, conn, byName, opts) {
   const stats = makeStats();
 
-  for (const row of rows) {
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
     try {
       const rectorNo = parseInt(row['No'] || row['Rector No'] || row['#'], 10);
       const fullName = clean(row['Name'] || row['Full Name']);
 
       if (!rectorNo || !fullName) {
-        console.warn('  [SKIP] Missing rector_no or name');
+        const msg = `[SKIP] ${rowLabel(i)} — Missing rector_no or name`;
+        console.warn(`  ${msg}`);
+        stats.failures.push(msg);
         stats.skipped++;
         continue;
       }
@@ -652,11 +687,13 @@ async function importRectors(rows, conn, byName, opts) {
         }
       }
 
-      if (opts.verbose) console.log(`  [OK] Rector #${rectorNo}: ${fullName}`);
+      if (opts.verbose) console.log(`  [OK] ${rowLabel(i)} Rector #${rectorNo}: ${fullName}`);
       stats.inserted++;
 
     } catch (err) {
-      console.error(`  [ERROR] Rector row: ${err.message}`);
+      const msg = `[ERROR] ${rowLabel(i)} Rector: ${err.message}`;
+      console.error(`  ${msg}`);
+      stats.failures.push(msg);
       stats.warned++;
     }
   }
@@ -669,13 +706,16 @@ async function importRectors(rows, conn, byName, opts) {
 async function importFathers(rows, conn, byName, opts) {
   const stats = makeStats();
 
-  for (const row of rows) {
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
     try {
       const fatherNo = parseInt(row['No'] || row['Father No'] || row['#'], 10);
       const fullName = clean(row['Name'] || row['Full Name']);
 
       if (!fatherNo || !fullName) {
-        console.warn('  [SKIP] Missing father_no or name');
+        const msg = `[SKIP] ${rowLabel(i)} — Missing father_no or name`;
+        console.warn(`  ${msg}`);
+        stats.failures.push(msg);
         stats.skipped++;
         continue;
       }
@@ -726,11 +766,13 @@ async function importFathers(rows, conn, byName, opts) {
         }
       }
 
-      if (opts.verbose) console.log(`  [OK] Father #${fatherNo}: ${fullName}`);
+      if (opts.verbose) console.log(`  [OK] ${rowLabel(i)} Father #${fatherNo}: ${fullName}`);
       stats.inserted++;
 
     } catch (err) {
-      console.error(`  [ERROR] Father row: ${err.message}`);
+      const msg = `[ERROR] ${rowLabel(i)} Father: ${err.message}`;
+      console.error(`  ${msg}`);
+      stats.failures.push(msg);
       stats.warned++;
     }
   }
@@ -743,11 +785,14 @@ async function importFathers(rows, conn, byName, opts) {
 async function importVestedSchools(rows, conn, opts) {
   const stats = makeStats();
 
-  for (const row of rows) {
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
     try {
       const schoolName = clean(row['School Name'] || row['Name']);
       if (!schoolName) {
-        console.warn('  [SKIP] Missing school name');
+        const msg = `[SKIP] ${rowLabel(i)} — Missing school name`;
+        console.warn(`  ${msg}`);
+        stats.failures.push(msg);
         stats.skipped++;
         continue;
       }
@@ -946,11 +991,13 @@ async function importVestedSchools(rows, conn, opts) {
         );
       }
 
-      if (opts.verbose) console.log(`  [OK] Vested school: ${schoolName}`);
+      if (opts.verbose) console.log(`  [OK] ${rowLabel(i)} Vested school: ${schoolName}`);
       stats.inserted++;
 
     } catch (err) {
-      console.error(`  [ERROR] Vested school row: ${err.message}`);
+      const msg = `[ERROR] ${rowLabel(i)} Vested school: ${err.message}`;
+      console.error(`  ${msg}`);
+      stats.failures.push(msg);
       stats.warned++;
     }
   }
@@ -1126,8 +1173,17 @@ Modules (run in dependency order):
   ────────────────────────────────────────────────
 `);
 
-    if (stats.warned > 0) {
-      console.log('  Some rows had errors. Review the messages above.');
+    if (stats.failures.length > 0) {
+      const ts       = new Date().toISOString().replace(/[:.]/g, '-');
+      const logPath  = path.resolve(__dirname, `import-failures-${opts.module}-${ts}.log`);
+      const logLines = [
+        `Import failures — module: ${opts.module}, file: ${opts.file}, time: ${new Date().toISOString()}`,
+        `Total failures: ${stats.failures.length}`,
+        '',
+        ...stats.failures,
+      ];
+      fs.writeFileSync(logPath, logLines.join('\n') + '\n', 'utf8');
+      console.log(`  Failures written to: ${logPath}`);
       console.log('  Re-run with --verbose for per-row detail.\n');
     }
 

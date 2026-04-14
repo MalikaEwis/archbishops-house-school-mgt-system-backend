@@ -26,6 +26,11 @@ const config     = require('../../config/env');
 const { VALID_CATEGORIES, VALID_OWNER_TYPES } = require('./documents.upload');
 const { ROLE_GROUPS } = require('../../shared/constants/roles');
 
+// Form codes that are always restricted to administrators, regardless of the
+// admin_only flag sent by the caller.  ACIS_03 and ACIS_11 contain sensitive
+// personnel information and must never be visible to principal / head_of_hr.
+const ALWAYS_ADMIN_ONLY_FORMS = new Set(['ACIS_03', 'ACIS_11']);
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function isAdmin(user) {
@@ -167,17 +172,22 @@ async function upload(body, file, user) {
   // stored_path is relative to config.upload.dir
   const storedPath = path.join('documents', file.filename).replace(/\\/g, '/');
 
+  // ACIS_03 and ACIS_11 are always admin-only; override whatever the caller sent.
+  const adminOnly = ALWAYS_ADMIN_ONLY_FORMS.has(body.form_code)
+    ? 1
+    : (body.admin_only === '1' || body.admin_only === true ? 1 : 0);
+
   const insertId = await repo.insert({
-    owner_type:     body.owner_type   || null,
-    owner_id:       body.owner_id     ? Number(body.owner_id) : null,
-    doc_category:   body.doc_category,
-    form_code:      body.form_code,
-    original_name:  file.originalname,
-    stored_path:    storedPath,
-    mime_type:      file.mimetype,
+    owner_type:      body.owner_type   || null,
+    owner_id:        body.owner_id     ? Number(body.owner_id) : null,
+    doc_category:    body.doc_category,
+    form_code:       body.form_code,
+    original_name:   file.originalname,
+    stored_path:     storedPath,
+    mime_type:       file.mimetype,
     file_size_bytes: file.size,
-    admin_only:     body.admin_only === '1' || body.admin_only === true ? 1 : 0,
-    uploaded_by:    user.sub,
+    admin_only:      adminOnly,
+    uploaded_by:     user.sub,
   });
 
   return repo.findById(insertId);

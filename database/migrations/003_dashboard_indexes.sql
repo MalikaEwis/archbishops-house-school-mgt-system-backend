@@ -10,17 +10,13 @@
 -- ============================================================
 
 -- Private teachers: active + name sort (no school filter)
-ALTER TABLE private_school_teachers
-  ADD INDEX IF NOT EXISTS idx_pst_active_name (is_active, full_name);
+CREATE INDEX IF NOT EXISTS idx_pst_active_name        ON private_school_teachers       (is_active, full_name);
 
 -- Private teachers: active + school filter + name sort (principal/HR path)
-ALTER TABLE private_school_teachers
-  ADD INDEX IF NOT EXISTS idx_pst_active_school_name (is_active, school_id, full_name);
+CREATE INDEX IF NOT EXISTS idx_pst_active_school_name ON private_school_teachers       (is_active, school_id, full_name);
 
 -- International teachers: active + name sort
-ALTER TABLE international_school_teachers
-  ADD INDEX IF NOT EXISTS idx_ist_active_name (is_active, full_name);
+CREATE INDEX IF NOT EXISTS idx_ist_active_name        ON international_school_teachers (is_active, full_name);
 
 -- International teachers: active + school filter + name sort
-ALTER TABLE international_school_teachers
-  ADD INDEX IF NOT EXISTS idx_ist_active_school_name (is_active, school_id, full_name);
+CREATE INDEX IF NOT EXISTS idx_ist_active_school_name ON international_school_teachers (is_active, school_id, full_name);
