@@ -1,0 +1,44 @@
+.bar {
+  align-items: center;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  margin-top: auto;
+}
+
+.info {
+  color: #6b7280;
+  font-size: 0.82rem;
+}
+
+.controls {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.pages {
+  color: #374151;
+  font-size: 0.85rem;
+}
+
+.btn {
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  color: #374151;
+  cursor: pointer;
+  font-size: 0.82rem;
+  padding: 0.3rem 0.7rem;
+  transition: background 0.12s;
+}
+
+.btn:hover:not(:disabled) {
+  background: #f3f4f6;
+}
+
+.btn:disabled {
+  color: #d1d5db;
+  cursor: not-allowed;
+}

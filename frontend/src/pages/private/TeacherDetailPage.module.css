@@ -1,0 +1,34 @@
+.page {
+  max-width: 900px;
+}
+
+.back {
+  background: transparent;
+  border: none;
+  color: #6366f1;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  padding: 0;
+}
+
+.back:hover {
+  text-decoration: underline;
+}
+
+.heading {
+  color: #111827;
+  font-size: 1.375rem;
+  font-weight: 700;
+  margin: 0 0 1.5rem;
+}
+
+.placeholder {
+  border: 2px dashed #e5e7eb;
+  border-radius: 8px;
+  color: #9ca3af;
+  font-size: 0.9rem;
+  padding: 3rem 2rem;
+  text-align: center;
+}
