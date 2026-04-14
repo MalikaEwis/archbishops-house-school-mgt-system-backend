@@ -26,16 +26,19 @@ across three school categories: **Private**, **International**, and **Vested**.
 
 - Node.js ≥ 18
 - MySQL 8.0+
+- Git
 
-### 2. Install dependencies
+### 2. Clone and install
 
 ```bash
+git clone <repo-url>
+cd archbishops-house-school-mgt-system-backend
 npm install
 ```
 
 ### 3. Configure environment
 
-Create a `.env` file in the project root:
+Copy the example below into a `.env` file in the project root:
 
 ```env
 NODE_ENV=development
@@ -55,43 +58,85 @@ UPLOAD_DIR=uploads
 MAX_FILE_SIZE_MB=10
 ```
 
-### 4. Apply the database schema
+### 4. Create the database
+
+```bash
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS archbishops_school_mgt CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+```
+
+### 5. Apply schema and migrations
 
 ```bash
 mysql -u root -p archbishops_school_mgt < database/schema.sql
-```
 
-Then apply migrations in order:
-
-```bash
 mysql -u root -p archbishops_school_mgt < database/migrations/001_add_profile_picture.sql
 mysql -u root -p archbishops_school_mgt < database/migrations/002_add_tin_sequences.sql
 mysql -u root -p archbishops_school_mgt < database/migrations/003_dashboard_indexes.sql
 mysql -u root -p archbishops_school_mgt < database/migrations/004_documents_category.sql
+mysql -u root -p archbishops_school_mgt < database/migrations/005_audit_logs.sql
 ```
 
-### 5. Seed admin users
+### 6. Seed admin users
 
 ```bash
 npm run seed
 ```
 
-Default password for all seeded accounts is `ChangeMe123!`. **Change these immediately.**
-Override via environment variables (see `database/seed_admin.js`).
+This creates one admin account per school type. Default password for all accounts is `ChangeMe123!` — **change these immediately in production.**
 
-### 6. Run the server
+Override defaults via environment variables — see `database/seed_admin.js` for the variable names.
+
+### 7. Import legacy data
+
+Place the original Excel files under `database/CSV_files_of_the_current_system/` in the folder structure the scripts expect, then run the import modules **in this exact order** (each step depends on the previous):
 
 ```bash
-npm run dev      # nodemon — auto-restart on file changes
-npm start        # production
+# Schools must come first — all other modules resolve school IDs from this table
+npm run import:schools
+
+# Private school teachers (active)
+npm run import:private
+
+# Retired private school teachers (is_active = 0)
+npm run import:retired
+
+# International school teachers
+npm run import:international
+
+# Archdiocesan rectors
+npm run import:rectors
+
+# College fathers
+npm run import:fathers
+
+# Vested schools, principals, and student statistics
+npm run import:vested
 ```
+
+Each command runs in **live mode** — changes are committed. To validate without writing to the database, add `--dry-run`:
+
+```bash
+node database/import_xlsx.js --module private --dry-run
+node database/import_xlsx.js --module private --dry-run --verbose  # prints every row
+```
+
+After a successful import the script automatically syncs `tin_sequences` so that the TIN allocation system picks up from where the imported data left off.
+
+### 8. Start the server
+
+```bash
+npm run dev    # development (auto-restart on file change)
+npm start      # production
+```
+
+The API is available at `http://localhost:5000`.
 
 ---
 
 ## Architecture
 
-The backend is a **modular monolith**: one Express application, six feature modules,
-each owning its own routes → controller → service → repository chain.
+The backend is a **modular monolith**: one Express application, each feature module
+owns its own routes → controller → service → repository chain.
 
 ```
 src/
@@ -119,10 +164,12 @@ src/
 └── modules/
     ├── auth/               Login, JWT issue, token verify
     ├── teachers/           Private school teacher CRUD + removal workflow
-    ├── schools/            School master list (stub — extend as needed)
+    ├── schools/            School master list
     ├── tin/                TIN allocation, preview, lookup
     ├── documents/          Document upload / replace / download / delete
-    └── vested/             Vested school CRUD, principals, student stats
+    ├── vested/             Vested school CRUD, principals, student stats
+    ├── rectors/            Archdiocesan rector CRUD
+    └── fathers/            College father CRUD
 ```
 
 ### Request lifecycle
@@ -171,8 +218,7 @@ The decoded payload (`req.user`) carries:
 | `principal`           | View-only, filtered to their assigned school        |
 | `head_of_hr`          | View-only, filtered to their assigned school        |
 
-`schoolFilter` middleware enforces the school boundary server-side.
-`principal` and `head_of_hr` users **cannot** override it via query params.
+`schoolFilter` middleware enforces the school boundary server-side — `principal` and `head_of_hr` users cannot override it via query params.
 
 ---
 
@@ -274,6 +320,30 @@ Write routes require `admin_vested`.
 
 Vested school filters: `?zone=Colombo&district=Gampaha&principalReligion=Catholic`
 
+### Rectors
+
+Write routes require `admin_vested`.
+
+| Method | Path              | Roles        | Description        |
+| ------ | ----------------- | ------------ | ------------------ |
+| GET    | /api/rectors      | All          | List rectors       |
+| POST   | /api/rectors      | admin_vested | Create rector      |
+| GET    | /api/rectors/:id  | All          | Rector detail      |
+| PATCH  | /api/rectors/:id  | admin_vested | Update rector      |
+| DELETE | /api/rectors/:id  | admin_vested | Delete rector      |
+
+### Fathers
+
+Write routes require `admin_vested`.
+
+| Method | Path              | Roles        | Description        |
+| ------ | ----------------- | ------------ | ------------------ |
+| GET    | /api/fathers      | All          | List fathers       |
+| POST   | /api/fathers      | admin_vested | Create father      |
+| GET    | /api/fathers/:id  | All          | Father detail      |
+| PATCH  | /api/fathers/:id  | admin_vested | Update father      |
+| DELETE | /api/fathers/:id  | admin_vested | Delete father      |
+
 ---
 
 ## TIN System
@@ -296,9 +366,7 @@ Example: 1/026/013/2524
 | 01 – 32      | Private       |
 | 51 – 55      | International |
 
-**Concurrency**: TIN allocation uses `SELECT ... FOR UPDATE` on the `tin_sequences`
-table inside the teacher-creation transaction. Vacant rows (soft-deleted teachers)
-are reused first (FR-8) before incrementing the global counter.
+**Concurrency**: TIN allocation uses `SELECT ... FOR UPDATE` on the `tin_sequences` table inside the teacher-creation transaction. Vacant rows (soft-deleted teachers) are reused first before incrementing the global counter.
 
 ---
 
@@ -309,53 +377,13 @@ Direct deletion is blocked. Removal requires two distinct admins:
 1. **Admin A** — `POST /api/teachers/:id/removal-request` with a `reason`
 2. **Admin B** (different user) — `POST /api/teachers/removal-requests/:id/approve`
 
-On approval, the teacher row is soft-deleted: all personal data is cleared
-but the TIN components are preserved for potential reuse (FR-19).
-
----
-
-## CSV Import
-
-Migrate legacy CSV exports into the database using the import tool.
-
-```bash
-# Always import schools first — other modules resolve school FKs from this table
-node database/import_csv.js --module schools       --file ./data/schools.csv
-
-# Vested schools (extends the schools table)
-node database/import_csv.js --module vested        --file ./data/vested.csv
-
-# Teachers (school index is resolved from TIN components)
-node database/import_csv.js --module private       --file ./data/private_teachers.csv
-node database/import_csv.js --module international --file ./data/intl_teachers.csv
-
-# Religious personnel
-node database/import_csv.js --module rectors       --file ./data/rectors.csv
-node database/import_csv.js --module fathers       --file ./data/fathers.csv
-```
-
-**Flags:**
-
-| Flag        | Effect                                             |
-| ----------- | -------------------------------------------------- |
-| `--dry-run` | Process and validate but roll back — nothing saved |
-| `--verbose` | Print a log line for every row                     |
-
-**Key behaviours:**
-
-- All inserts run inside a single transaction — on any fatal error the whole batch rolls back.
-- Duplicate detection: private/international teachers skip on duplicate NIC; schools use `ON DUPLICATE KEY UPDATE`.
-- After importing teachers the script runs `syncTinSequences()` which sets `tin_sequences.last_global` to the true MAX from the imported rows, keeping TIN allocation correct for all future API operations.
-- Multi-value CSV cells (mediums, qualifications, subjects) are split on `|`, `,`, or `;`.
-- Dates are normalised from `DD/MM/YYYY`, `DD-MM-YYYY`, `YYYY/MM/DD`, year-only, or ISO format.
-
-See `database/csv_mapping.md` for the full column → table mapping reference.
+On approval the teacher row is soft-deleted: all personal data is cleared but TIN components are preserved for potential reuse.
 
 ---
 
 ## Computed Fields
 
-These values are **never stored**. They are calculated at query time:
+These values are never stored — calculated at query time:
 
 | Field           | Formula                                                     |
 | --------------- | ----------------------------------------------------------- |
@@ -363,8 +391,6 @@ These values are **never stored**. They are calculated at query time:
 | Retirement date | `DATE_ADD(date_of_birth, INTERVAL 60 YEAR)`                 |
 | Service years   | `TIMESTAMPDIFF(YEAR, date_of_first_appointment, CURDATE())` |
 | Catholic %      | `count_catholic / NULLIF(total_students,0) * 100`           |
-
-See `database/computed_fields.sql` for all expressions.
 
 ---
 
@@ -378,5 +404,4 @@ uploads/
 └── documents/          ACPS / ACIS PDF forms
 ```
 
-`stored_path` in the `documents` table is relative to `UPLOAD_DIR`.
-The server resolves the absolute path on download.
+`stored_path` in the `documents` table is relative to `UPLOAD_DIR`. The server resolves the absolute path on download.

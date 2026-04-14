@@ -1,46 +1,26 @@
 {
-  "name": "archbishops-house-school-mgt-system-backend",
+  "name": "archbishops-house-school-mgt-system",
   "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
-    "seed": "node database/seed_admin.js",
-    "import:schools":       "node database/import_xlsx.js --module schools",
-    "import:private":       "node database/import_xlsx.js --module private",
-    "import:retired":       "node database/import_xlsx.js --module retired",
-    "import:international": "node database/import_xlsx.js --module international",
-    "import:rectors":       "node database/import_xlsx.js --module rectors",
-    "import:fathers":       "node database/import_xlsx.js --module fathers",
-    "import:vested":        "node database/import_xlsx.js --module vested",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git@github-work:MalikaEwis/archbishops-house-school-mgt-system-backend.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "dependencies": {
-    "bcryptjs": "^3.0.3",
-    "cors": "^2.8.6",
-    "dotenv": "^17.4.0",
-    "express": "^5.2.1",
-    "express-rate-limit": "^8.3.2",
-    "helmet": "^8.1.0",
-    "http-status-codes": "^2.3.0",
-    "jsonwebtoken": "^9.0.3",
-    "morgan": "^1.10.1",
-    "multer": "^2.1.1",
-    "mysql2": "^3.20.0",
-    "winston": "^3.19.0"
+    "dev": "concurrently --names BACK,FRONT --prefix-colors cyan,magenta \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "npm run dev --workspace=backend",
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "build": "npm run build --workspace=frontend",
+    "seed": "npm run seed --workspace=backend",
+    "import:schools": "npm run import:schools       --workspace=backend",
+    "import:private": "npm run import:private       --workspace=backend",
+    "import:retired": "npm run import:retired       --workspace=backend",
+    "import:international": "npm run import:international --workspace=backend",
+    "import:rectors": "npm run import:rectors       --workspace=backend",
+    "import:fathers": "npm run import:fathers       --workspace=backend",
+    "import:vested": "npm run import:vested        --workspace=backend"
   },
   "devDependencies": {
-    "@types/multer": "^2.1.0",
-    "nodemon": "^3.1.14",
-    "xlsx": "^0.18.5"
+    "concurrently": "^9.2.1"
   }
 }
