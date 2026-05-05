@@ -1,7 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchTeacher } from '../../api/teachers';
+import { useAuth } from '../../auth/AuthContext';
 import styles from './TeacherDetailPage.module.css';
+
+const READ_ONLY_ROLES = ['principal', 'head_of_hr'];
+
+function getBasePath(role) {
+  return READ_ONLY_ROLES.includes(role) ? '/my-school/teachers' : '/private/teachers';
+}
 
 const CATEGORY_LABELS = {
   1: 'Cat 1 – Pensionable',
@@ -13,6 +20,9 @@ const CATEGORY_LABELS = {
 export default function TeacherDetailPage() {
   const { id }   = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const readOnly = READ_ONLY_ROLES.includes(user?.role);
+  const basePath = getBasePath(user?.role);
 
   const [teacher, setTeacher] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -31,7 +41,7 @@ export default function TeacherDetailPage() {
   if (loading) {
     return (
       <div className={styles.page}>
-        <button className={styles.backBtn} onClick={() => navigate('/private/teachers')}>
+        <button className={styles.backBtn} onClick={() => navigate(basePath)}>
           ← Back to list
         </button>
         <p className={styles.stateMsg}>Loading…</p>
@@ -43,7 +53,7 @@ export default function TeacherDetailPage() {
   if (error) {
     return (
       <div className={styles.page}>
-        <button className={styles.backBtn} onClick={() => navigate('/private/teachers')}>
+        <button className={styles.backBtn} onClick={() => navigate(basePath)}>
           ← Back to list
         </button>
         <p className={styles.error}>{error}</p>
@@ -57,17 +67,23 @@ export default function TeacherDetailPage() {
     <div className={styles.page}>
       {/* ── Toolbar ─────────────────────────────────────────────────────── */}
       <div className={styles.toolbar}>
-        <button className={styles.backBtn} onClick={() => navigate('/private/teachers')}>
+        <button className={styles.backBtn} onClick={() => navigate(basePath)}>
           ← Back to list
         </button>
-        <div className={styles.actions}>
-          <button className={styles.editBtn} disabled={isRemoved}>
-            Edit
-          </button>
-          <button className={styles.removalBtn} disabled={isRemoved}>
-            Request Removal
-          </button>
-        </div>
+        {!readOnly && (
+          <div className={styles.actions}>
+            <button
+              className={styles.editBtn}
+              disabled={isRemoved}
+              onClick={() => navigate(`/private/teachers/${teacher.id}/edit`)}
+            >
+              Edit
+            </button>
+            <button className={styles.removalBtn} disabled={isRemoved}>
+              Request Removal
+            </button>
+          </div>
+        )}
       </div>
 
       {/* ── Page title ──────────────────────────────────────────────────── */}

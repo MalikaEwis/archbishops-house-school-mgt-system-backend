@@ -13,7 +13,7 @@ export function getRoleHome(role) {
     case 'admin_international': return '/international/teachers';
     case 'admin_vested':        return '/vested/schools';
     case 'principal':
-    case 'head_of_hr':          return '/my-school';
+    case 'head_of_hr':          return '/my-school/teachers';
     default:                    return '/dashboard';
   }
 }

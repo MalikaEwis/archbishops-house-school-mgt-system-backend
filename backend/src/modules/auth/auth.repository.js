@@ -13,16 +13,18 @@ async function findByUsername(username) {
   const pool = getPool();
   const [rows] = await pool.execute(
     `SELECT
-       id,
-       username,
-       password_hash,
-       full_name,
-       role,
-       school_type,
-       school_id,
-       is_active
-     FROM users
-     WHERE username = ?
+       u.id,
+       u.username,
+       u.password_hash,
+       u.full_name,
+       u.role,
+       u.school_type,
+       u.school_id,
+       u.is_active,
+       s.school_name
+     FROM users u
+     LEFT JOIN schools s ON s.id = u.school_id
+     WHERE u.username = ?
      LIMIT 1`,
     [username],
   );
@@ -40,17 +42,19 @@ async function findById(id) {
   const pool = getPool();
   const [rows] = await pool.execute(
     `SELECT
-       id,
-       username,
-       full_name,
-       role,
-       school_type,
-       school_id,
-       is_active,
-       last_login_at,
-       created_at
-     FROM users
-     WHERE id = ?
+       u.id,
+       u.username,
+       u.full_name,
+       u.role,
+       u.school_type,
+       u.school_id,
+       u.is_active,
+       u.last_login_at,
+       u.created_at,
+       s.school_name
+     FROM users u
+     LEFT JOIN schools s ON s.id = u.school_id
+     WHERE u.id = ?
      LIMIT 1`,
     [id],
   );

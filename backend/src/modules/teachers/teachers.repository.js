@@ -192,7 +192,10 @@ async function findAll(filters, { limit = 20, offset = 0 } = {}) {
   params.push(limit, offset);
 
   const sql = `${BASE_SELECT} WHERE ${clauses.join(" AND ")} ORDER BY t.full_name ASC LIMIT ? OFFSET ?`;
-  const [rows] = await pool.execute(sql, params);
+  // pool.query() (text protocol) instead of pool.execute() (binary/prepared-statement
+  // protocol) — the binary protocol rejects the complex nested TIMESTAMPDIFF /
+  // DATE_ADD expressions in BASE_SELECT with "Incorrect arguments to mysqld_stmt_execute".
+  const [rows] = await pool.query(sql, params);
   return rows;
 }
 
@@ -208,9 +211,7 @@ async function findAll(filters, { limit = 20, offset = 0 } = {}) {
  */
 async function findById(id) {
   const pool = getPool();
-  const [rows] = await pool.execute(`${BASE_SELECT} WHERE t.id = ? LIMIT 1`, [
-    id,
-  ]);
+  const [rows] = await pool.query(`${BASE_SELECT} WHERE t.id = ? LIMIT 1`, [id]);
   return rows[0];
 }
 

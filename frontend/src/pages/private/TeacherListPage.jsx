@@ -1,8 +1,15 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { fetchTeachers } from '../../api/teachers';
+import { useAuth } from '../../auth/AuthContext';
 import Pagination from '../../components/Pagination';
 import styles from './TeacherListPage.module.css';
+
+const READ_ONLY_ROLES = ['principal', 'head_of_hr'];
+
+function getBasePath(role) {
+  return READ_ONLY_ROLES.includes(role) ? '/my-school/teachers' : '/private/teachers';
+}
 
 // present_category numeric → readable label
 const CATEGORY_LABELS = {
@@ -29,7 +36,10 @@ const STATUS_OPTIONS = [
 const PAGE_LIMIT = 20;
 
 export default function TeacherListPage() {
-  const navigate = useNavigate();
+  const navigate  = useNavigate();
+  const { user }  = useAuth();
+  const readOnly  = READ_ONLY_ROLES.includes(user?.role);
+  const basePath  = getBasePath(user?.role);
   const [searchParams, setSearchParams] = useSearchParams();
 
   // ── Filter state — initialise from URL so browser back/forward works ───────
@@ -106,12 +116,14 @@ export default function TeacherListPage() {
             <p className={styles.total}>{pagination.total} teacher{pagination.total !== 1 ? 's' : ''}</p>
           )}
         </div>
-        <button
-          className={styles.createBtn}
-          onClick={() => navigate('/private/teachers/new')}
-        >
-          + Create Teacher
-        </button>
+        {!readOnly && (
+          <button
+            className={styles.createBtn}
+            onClick={() => navigate('/private/teachers/new')}
+          >
+            + Create Teacher
+          </button>
+        )}
       </div>
 
       {/* ── Filters ─────────────────────────────────────────────────────── */}
@@ -187,7 +199,7 @@ export default function TeacherListPage() {
                 <td>
                   <button
                     className={styles.viewBtn}
-                    onClick={() => navigate(`/private/teachers/${t.id}`)}
+                    onClick={() => navigate(`${basePath}/${t.id}`)}
                   >
                     View
                   </button>

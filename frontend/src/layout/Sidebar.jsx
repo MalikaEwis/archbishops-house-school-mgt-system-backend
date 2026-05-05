@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { useAuth, getRoleHome } from '../auth/AuthContext';
+import { useAuth } from '../auth/AuthContext';
 import styles from './Sidebar.module.css';
 
 const ROLE_LABELS = {
@@ -21,10 +21,10 @@ const NAV_BY_ROLE = {
     { label: 'Schools',    to: '/vested/schools' },
   ],
   principal: [
-    { label: 'My School',  to: '/my-school' },
+    { label: 'Teachers', to: '/my-school/teachers' },
   ],
   head_of_hr: [
-    { label: 'My School',  to: '/my-school' },
+    { label: 'Teachers', to: '/my-school/teachers' },
   ],
 };
 
@@ -41,6 +41,10 @@ export default function Sidebar() {
       </div>
 
       <div className={styles.section}>{section}</div>
+
+      {user?.school_name && (
+        <div className={styles.schoolName}>{user.school_name}</div>
+      )}
 
       <nav className={styles.nav}>
         {navItems.map(({ label, to }) => (
