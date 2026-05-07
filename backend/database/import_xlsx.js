@@ -414,19 +414,44 @@ async function allocateTinForImport(conn, tableType, category, schoolNumber) {
 // ─── School lookup map builders ───────────────────────────────────────────────
 
 /**
+ * Normalises a school name for loose matching:
+ * lowercase → strip punctuation → collapse whitespace.
+ * "St. Joseph's College, Colombo 10" → "st josephs college colombo 10"
+ */
+function normalizeName(name) {
+  if (!name) return '';
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, '')   // remove all punctuation
+    .replace(/\s+/g, ' ')          // collapse runs of spaces
+    .trim();
+}
+
+/**
+ * Known mismatches between the rectors/fathers spreadsheet and the schools table.
+ * Keys are the NORMALISED form of the name as it appears in the spreadsheet.
+ * Values are the NORMALISED form of the name as it appears in the schools table.
+ * Add one entry per mismatch found by running --dry-run --verbose.
+ */
+const SCHOOL_NAME_ALIASES = {
+  // Example (uncomment and adjust after running dry-run):
+  // 'st josephs college': 'st josephs college colombo 10',
+};
+
+/**
  * Fetches all schools from DB and returns lookup maps.
- * byIndex: '001' → id
- * byName:  'St. Bridget\'s Convent...' → id
+ * byIndex:       '001' → id
+ * byNormName:    normalizeName(school_name) → id   (used for fathers/rectors)
  */
 async function buildSchoolMaps(conn) {
   const [rows] = await conn.execute('SELECT id, school_index, school_name FROM schools');
-  const byIndex = {};
-  const byName  = {};
+  const byIndex    = {};
+  const byNormName = {};
   for (const r of rows) {
-    if (r.school_index) byIndex[r.school_index] = r.id;
-    if (r.school_name)  byName[r.school_name]   = r.id;
+    if (r.school_index) byIndex[r.school_index]              = r.id;
+    if (r.school_name)  byNormName[normalizeName(r.school_name)] = r.id;
   }
-  return { byIndex, byName };
+  return { byIndex, byNormName };
 }
 
 /**
@@ -1059,7 +1084,7 @@ async function importInternationalTeachers(wb, conn, byIndex, opts) {
  */
 const RECTOR_QUAL_NAMES = ['BTh', 'BPh', 'LTh', 'Degree', 'Masters', 'M.Phil', 'PhD', 'COE', 'BEd', 'PGDE', 'MEd', 'Other Dip.'];
 
-async function importRectors(wb, conn, byName, opts) {
+async function importRectors(wb, conn, byNormName, opts) {
   const stats  = makeStats();
   const matrix = sheetToMatrix(wb, 'Rectors');
 
@@ -1081,14 +1106,13 @@ async function importRectors(wb, conn, byName, opts) {
         continue;
       }
 
-      // School lookup by name
-      const schoolName = clean(row[2]);
-      const schoolId   = schoolName ? (byName[schoolName] ?? null) : null;
+      // School lookup by normalised name (with alias fallback)
+      const schoolName   = clean(row[2]);
+      const normRaw      = normalizeName(schoolName);
+      const normResolved = SCHOOL_NAME_ALIASES[normRaw] ?? normRaw;
+      const schoolId     = normResolved ? (byNormName[normResolved] ?? null) : null;
       if (schoolName && !schoolId) {
-        // Log a warning but do NOT skip — school name might not match exactly
-        if (opts.verbose) {
-          console.warn(`  [WARN] ${rowLabel(i)} Rector "${fullName}": school "${schoolName}" not found — setting NULL`);
-        }
+        console.warn(`  [WARN] ${rowLabel(i)} Rector "${fullName}": school "${schoolName}" not found — setting NULL`);
       }
 
       // Qualifications: columns 8-19 hold √ or blank for each qual name
@@ -1186,7 +1210,7 @@ async function importRectors(wb, conn, byName, opts) {
  */
 const FATHER_QUAL_NAMES = ['BTh', 'BPh', 'Degree', 'Masters', 'M.Phil', 'PhD', 'COE', 'BEd', 'PGDE', 'MEd', 'Other Dip.'];
 
-async function importFathers(wb, conn, byName, opts) {
+async function importFathers(wb, conn, byNormName, opts) {
   const stats  = makeStats();
   const matrix = sheetToMatrix(wb, 'College Fathers');
 
@@ -1207,9 +1231,12 @@ async function importFathers(wb, conn, byName, opts) {
         continue;
       }
 
-      const schoolName = clean(row[2]);
-      const schoolId   = schoolName ? (byName[schoolName] ?? null) : null;
-      if (schoolName && !schoolId && opts.verbose) {
+      // School lookup by normalised name (with alias fallback)
+      const schoolName   = clean(row[2]);
+      const normRaw      = normalizeName(schoolName);
+      const normResolved = SCHOOL_NAME_ALIASES[normRaw] ?? normRaw;
+      const schoolId     = normResolved ? (byNormName[normResolved] ?? null) : null;
+      if (schoolName && !schoolId) {
         console.warn(`  [WARN] ${rowLabel(i)} Father "${fullName}": school "${schoolName}" not found — setting NULL`);
       }
 
@@ -1604,7 +1631,7 @@ Modules (run in dependency order):
   try {
     await conn.beginTransaction();
 
-    const { byIndex, byName } = await buildSchoolMaps(conn);
+    const { byIndex, byNormName } = await buildSchoolMaps(conn);
 
     let stats;
 
@@ -1644,14 +1671,14 @@ Modules (run in dependency order):
       case 'rectors': {
         console.log('  Loading Rectors…');
         const wb = loadWorkbook(RECTORS_FILE);
-        stats = await importRectors(wb, conn, byName, opts);
+        stats = await importRectors(wb, conn, byNormName, opts);
         break;
       }
 
       case 'fathers': {
         console.log('  Loading College Fathers…');
         const wb = loadWorkbook(RECTORS_FILE);
-        stats = await importFathers(wb, conn, byName, opts);
+        stats = await importFathers(wb, conn, byNormName, opts);
         break;
       }
 

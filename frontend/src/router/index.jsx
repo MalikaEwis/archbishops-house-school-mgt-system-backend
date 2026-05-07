@@ -8,6 +8,12 @@ import Dashboard from "../pages/Dashboard";
 import TeacherListPage from "../pages/private/TeacherListPage";
 import TeacherDetailPage from "../pages/private/TeacherDetailPage";
 import TeacherFormPage from "../pages/private/TeacherFormPage";
+import FatherListPage from "../pages/private/FatherListPage";
+import FatherDetailPage from "../pages/private/FatherDetailPage";
+import FatherFormPage from "../pages/private/FatherFormPage";
+import RectorListPage from "../pages/private/RectorListPage";
+import RectorDetailPage from "../pages/private/RectorDetailPage";
+import RectorFormPage from "../pages/private/RectorFormPage";
 
 const router = createBrowserRouter([
   // ── Public ────────────────────────────────────────────────────────────────
@@ -33,13 +39,16 @@ const router = createBrowserRouter([
           {
             element: <RoleGuard roles={["admin_private"]} />,
             children: [
-              { path: "private/teachers", element: <TeacherListPage /> },
-              { path: "private/teachers/new", element: <TeacherFormPage /> },
-              { path: "private/teachers/:id", element: <TeacherDetailPage /> },
-              {
-                path: "private/teachers/:id/edit",
-                element: <TeacherFormPage />,
-              },
+              { path: "private/teachers",          element: <TeacherListPage /> },
+              { path: "private/teachers/new",       element: <TeacherFormPage /> },
+              { path: "private/teachers/:id",       element: <TeacherDetailPage /> },
+              { path: "private/teachers/:id/edit",  element: <TeacherFormPage /> },
+              { path: "private/fathers",            element: <FatherListPage /> },
+              { path: "private/fathers/:id",        element: <FatherDetailPage /> },
+              { path: "private/fathers/:id/edit",   element: <FatherFormPage /> },
+              { path: "private/rectors",            element: <RectorListPage /> },
+              { path: "private/rectors/:id",        element: <RectorDetailPage /> },
+              { path: "private/rectors/:id/edit",   element: <RectorFormPage /> },
             ],
           },
 

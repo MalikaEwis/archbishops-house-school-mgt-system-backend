@@ -1,24 +1,43 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { fetchTeacher } from '../../api/teachers';
-import { useAuth } from '../../auth/AuthContext';
-import styles from './TeacherDetailPage.module.css';
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { fetchTeacher } from "../../api/teachers";
+import { useAuth } from "../../auth/AuthContext";
+import styles from "./TeacherDetailPage.module.css";
 
-const READ_ONLY_ROLES = ['principal', 'head_of_hr'];
+const READ_ONLY_ROLES = ["principal", "head_of_hr"];
 
 function getBasePath(role) {
-  return READ_ONLY_ROLES.includes(role) ? '/my-school/teachers' : '/private/teachers';
+  return READ_ONLY_ROLES.includes(role)
+    ? "/my-school/teachers"
+    : "/private/teachers";
 }
 
 const CATEGORY_LABELS = {
-  1: 'Cat 1 – Pensionable',
-  2: 'Cat 2 – Unregistered Permanent',
-  3: 'Cat 3 – Unregistered Training',
-  4: 'Cat 4 – Fixed Term',
+  1: "Cat 1 – Pensionable",
+  2: "Cat 2 – Unregistered Permanent",
+  3: "Cat 3 – Unregistered Training",
+  4: "Cat 4 – Fixed Term",
 };
 
+const SSP_LABELS = {
+  Not_Completed: "Not Completed",
+  Yes:           "Yes",
+  Completed:     "Completed",
+};
+
+// DB stores 'Yes' for "Following"
+const DCETT_LABELS = {
+  Not_Completed: "Not Completed",
+  Yes:           "Following",
+  Completed:     "Completed",
+};
+
+function fmtAttempt(val) {
+  return val ?? "Not Participated";
+}
+
 export default function TeacherDetailPage() {
-  const { id }   = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const readOnly = READ_ONLY_ROLES.includes(user?.role);
@@ -26,14 +45,16 @@ export default function TeacherDetailPage() {
 
   const [teacher, setTeacher] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error,   setError]   = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     setLoading(true);
-    setError('');
+    setError("");
     fetchTeacher(id)
       .then(setTeacher)
-      .catch((err) => setError(err.response?.data?.message ?? 'Failed to load teacher.'))
+      .catch((err) =>
+        setError(err.response?.data?.message ?? "Failed to load teacher."),
+      )
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -89,10 +110,11 @@ export default function TeacherDetailPage() {
       {/* ── Page title ──────────────────────────────────────────────────── */}
       <div className={styles.titleRow}>
         <h1 className={styles.heading}>{teacher.full_name}</h1>
-        {isRemoved
-          ? <span className={styles.badgeRemoved}>Removed</span>
-          : <span className={styles.badgeActive}>Active</span>
-        }
+        {isRemoved ? (
+          <span className={styles.badgeRemoved}>Removed</span>
+        ) : (
+          <span className={styles.badgeActive}>Active</span>
+        )}
       </div>
 
       {isRemoved && teacher.removed_reason && (
@@ -105,12 +127,18 @@ export default function TeacherDetailPage() {
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>Identification</h2>
         <dl className={styles.grid}>
-          <Field label="TIN"      value={teacher.tin} mono />
-          <Field label="NIC"      value={teacher.nic} mono />
-          <Field label="Category" value={CATEGORY_LABELS[teacher.present_category] ?? teacher.present_category} />
-          <Field label="Gender"   value={teacher.gender} />
+          <Field label="TIN" value={teacher.tin} mono />
+          <Field label="NIC" value={teacher.nic} mono />
+          <Field
+            label="Category"
+            value={
+              CATEGORY_LABELS[teacher.present_category] ??
+              teacher.present_category
+            }
+          />
+          <Field label="Gender" value={teacher.gender} />
           <Field label="Religion" value={teacher.religion} />
-          <Field label="School"   value={teacher.school_name} />
+          <Field label="School" value={teacher.school_name} />
           <Field label="School index" value={teacher.school_index} />
         </dl>
       </section>
@@ -118,27 +146,58 @@ export default function TeacherDetailPage() {
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>Personal</h2>
         <dl className={styles.grid}>
-          <Field label="Date of birth"  value={fmtDate(teacher.date_of_birth)} />
-          <Field label="Age"            value={teacher.age != null ? `${teacher.age} yrs` : null} />
-          <Field label="Retirement date" value={fmtDate(teacher.retirement_date)} />
-          <Field label="Home address"   value={teacher.home_address} wide />
-          <Field label="Email"          value={teacher.email} />
+          <Field label="Date of birth" value={fmtDate(teacher.date_of_birth)} />
+          <Field
+            label="Age"
+            value={teacher.age != null ? `${teacher.age} yrs` : null}
+          />
+          <Field
+            label="Retirement date"
+            value={fmtDate(teacher.retirement_date)}
+          />
+          <Field label="Home address" value={teacher.home_address} wide />
+          <Field label="Email" value={teacher.email} />
         </dl>
       </section>
 
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>Service</h2>
         <dl className={styles.grid}>
-          <Field label="First appointment" value={fmtDate(teacher.date_of_first_appointment)} />
-          <Field label="Service years"     value={teacher.service_years != null ? `${teacher.service_years} yrs` : null} />
-          <Field label="Service status"    value={teacher.service_status} />
-          <Field label="Confirmation letter" value={teacher.confirmation_letter_status} />
+          <Field
+            label="First appointment"
+            value={fmtDate(teacher.date_of_first_appointment)}
+          />
+          <Field
+            label="Service years"
+            value={
+              teacher.service_years != null
+                ? `${teacher.service_years} yrs`
+                : null
+            }
+          />
+          <Field label="Prior service" value={teacher.service_status ? "Yes" : "No"} />
+          <Field
+            label="Confirmation letter"
+            value={teacher.confirmation_letter_status}
+          />
         </dl>
       </section>
 
-      {/* ── Phone numbers ────────────────────────────────────────────────── */}
+      {/* ── Training & Selection Test ────────────────────────────────────── */}
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Phone Numbers</h2>
+        <h2 className={styles.sectionTitle}>Training &amp; Selection Test</h2>
+        <dl className={styles.grid}>
+          <Field label="SSP Status"   value={SSP_LABELS[teacher.ssp_status]   ?? teacher.ssp_status} />
+          <Field label="DCETT Status" value={DCETT_LABELS[teacher.dcett_status] ?? teacher.dcett_status} />
+          <Field label="Selection Test – Attempt 1" value={fmtAttempt(teacher.selection_test_attempt1)} />
+          <Field label="Selection Test – Attempt 2" value={fmtAttempt(teacher.selection_test_attempt2)} />
+          <Field label="Selection Test – Attempt 3" value={fmtAttempt(teacher.selection_test_attempt3)} />
+        </dl>
+      </section>
+
+      {/* ── Contact Information ──────────────────────────────────────────── */}
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Contact Information</h2>
         {teacher.phones?.length > 0 ? (
           <table className={styles.miniTable}>
             <thead>
@@ -152,8 +211,8 @@ export default function TeacherDetailPage() {
               {teacher.phones.map((p) => (
                 <tr key={p.id}>
                   <td className={styles.mono}>{p.phone_number}</td>
-                  <td>{p.phone_type ?? '—'}</td>
-                  <td>{p.is_primary ? '✓' : ''}</td>
+                  <td>{p.phone_type ?? "—"}</td>
+                  <td>{p.is_primary ? "✓" : ""}</td>
                 </tr>
               ))}
             </tbody>
@@ -163,13 +222,28 @@ export default function TeacherDetailPage() {
         )}
       </section>
 
-      {/* ── Teaching details ─────────────────────────────────────────────── */}
+      {/* ── Contract Details ─────────────────────────────────────────────── */}
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Teaching Details</h2>
+        <h2 className={styles.sectionTitle}>Contract Details</h2>
         <dl className={styles.grid}>
-          <ChipField label="Subjects"     items={teacher.subjects} />
+          <Field label="Second contract start"  value={fmtDate(teacher.contract?.contract_2nd_start)} />
+          <Field label="Third contract start"   value={fmtDate(teacher.contract?.contract_3rd_start)} />
+          <Field label="Third contract expiry"  value={fmtDate(teacher.contract?.contract_3rd_expiry)} />
+        </dl>
+      </section>
+
+      {/* ── Qualifications & Teaching Details ───────────────────────────── */}
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Qualifications &amp; Teaching Details</h2>
+        <dl className={styles.grid}>
           <ChipField label="Mediums"      items={teacher.mediums} />
           <ChipField label="Class levels" items={teacher.class_levels} />
+          <ChipField label="Education"    items={(teacher.education ?? []).map((e) => e.qualification)} />
+          <ChipField
+            label="Professional qualifications"
+            items={(teacher.professional_qualifications ?? []).map((q) => q.qualification)}
+          />
+          <ChipField label="Subjects"     items={teacher.subjects} />
         </dl>
       </section>
     </div>
@@ -182,14 +256,26 @@ function fmtDate(val) {
   if (!val) return null;
   // ISO date string → locale date (no time)
   const d = new Date(val);
-  return isNaN(d) ? val : d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  return isNaN(d)
+    ? val
+    : d.toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      });
 }
 
 function Field({ label, value, mono, wide }) {
   return (
     <>
       <dt className={styles.dt}>{label}</dt>
-      <dd className={[styles.dd, mono ? styles.mono : '', wide ? styles.wide : ''].join(' ')}>
+      <dd
+        className={[
+          styles.dd,
+          mono ? styles.mono : "",
+          wide ? styles.wide : "",
+        ].join(" ")}
+      >
         {value ?? <span className={styles.nil}>—</span>}
       </dd>
     </>
@@ -204,7 +290,9 @@ function ChipField({ label, items }) {
         {items?.length > 0 ? (
           <div className={styles.chips}>
             {items.map((item) => (
-              <span key={item} className={styles.chip}>{item}</span>
+              <span key={item} className={styles.chip}>
+                {item}
+              </span>
             ))}
           </div>
         ) : (
