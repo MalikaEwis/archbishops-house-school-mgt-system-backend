@@ -85,10 +85,10 @@ export default function InternationalTeacherDetailPage() {
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>Employment</h2>
         <dl className={styles.grid}>
-          <Field label="School"              value={teacher.school_name} />
-          <Field label="Date of birth"       value={fmtDate(teacher.date_of_birth)} />
-          <Field label="Age"                 value={teacher.age != null ? `${teacher.age} yrs` : null} />
-          <Field label="First appointment"   value={fmtDate(teacher.date_of_first_appointment)} />
+          <Field label="School"                     value={teacher.school_name} />
+          <Field label="Date of birth"              value={fmtDate(teacher.date_of_birth)} />
+          <Field label="Age"                        value={teacher.age != null ? `${teacher.age} yrs` : null} />
+          <Field label="First appointment"          value={fmtDate(teacher.date_of_first_appointment)} />
           <Field
             label="Service"
             value={
@@ -99,7 +99,7 @@ export default function InternationalTeacherDetailPage() {
                 : null
             }
           />
-          <Field label="Retirement date" value={fmtDate(teacher.retirement_date)} />
+          <Field label="Retirement date"            value={fmtDate(teacher.retirement_date)} />
         </dl>
       </section>
 
@@ -140,6 +140,46 @@ export default function InternationalTeacherDetailPage() {
           </dl>
         </section>
       )}
+
+      {/* ── Mediums ───────────────────────────────────────────────────────── */}
+      {teacher.mediums && teacher.mediums.length > 0 && (
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Teaching Mediums</h2>
+          <ChipList items={teacher.mediums} />
+        </section>
+      )}
+
+      {/* ── Class Levels ──────────────────────────────────────────────────── */}
+      {teacher.class_levels && teacher.class_levels.length > 0 && (
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Class Levels</h2>
+          <ChipList items={teacher.class_levels} />
+        </section>
+      )}
+
+      {/* ── Education ─────────────────────────────────────────────────────── */}
+      {teacher.education && teacher.education.length > 0 && (
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Education</h2>
+          <ChipList items={teacher.education} />
+        </section>
+      )}
+
+      {/* ── Professional Qualifications ───────────────────────────────────── */}
+      {teacher.professional_qualifications && teacher.professional_qualifications.length > 0 && (
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Professional Qualifications</h2>
+          <ChipList items={teacher.professional_qualifications.map((q) => q.qualification ?? q)} />
+        </section>
+      )}
+
+      {/* ── Subjects ──────────────────────────────────────────────────────── */}
+      {teacher.subjects && teacher.subjects.length > 0 && (
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Subjects</h2>
+          <ChipList items={teacher.subjects.map((s) => s.subject_name ?? s)} />
+        </section>
+      )}
     </div>
   );
 }
@@ -157,6 +197,27 @@ function fmtDate(val) {
 function fmtCategory(val) {
   if (!val) return null;
   return val === 'Fixed_Term_Contract' ? 'Fixed Term Contract' : val;
+}
+
+function ChipList({ items }) {
+  return (
+    <ul style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', listStyle: 'none', padding: 0, margin: 0 }}>
+      {items.map((item, i) => (
+        <li
+          key={i}
+          style={{
+            background: 'var(--color-surface, #f1f5f9)',
+            border: '1px solid var(--color-border, #cbd5e1)',
+            borderRadius: '999px',
+            padding: '0.2rem 0.75rem',
+            fontSize: '0.85rem',
+          }}
+        >
+          {item}
+        </li>
+      ))}
+    </ul>
+  );
 }
 
 function Field({ label, value, mono }) {

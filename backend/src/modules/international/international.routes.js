@@ -10,7 +10,6 @@ const { ROLE_GROUPS } = require('../../shared/constants/roles');
 
 const router = Router();
 
-// ── Global guards: every route requires auth + school filter ─────────────────
 router.use(authenticate);
 router.use(schoolFilter);
 
@@ -21,11 +20,25 @@ router.get(
   asyncHandler(ctrl.getAll),
 );
 
+// POST /api/international-teachers
+router.post(
+  '/',
+  authorize(...ROLE_GROUPS.INTERNATIONAL_ADMINS),
+  asyncHandler(ctrl.create),
+);
+
 // GET  /api/international-teachers/:id
 router.get(
   '/:id',
   authorize(...ROLE_GROUPS.INTERNATIONAL_MODULE_ACCESS),
   asyncHandler(ctrl.getOne),
+);
+
+// PATCH /api/international-teachers/:id
+router.patch(
+  '/:id',
+  authorize(...ROLE_GROUPS.INTERNATIONAL_ADMINS),
+  asyncHandler(ctrl.update),
 );
 
 module.exports = router;

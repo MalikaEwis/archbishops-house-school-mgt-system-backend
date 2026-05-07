@@ -1,7 +1,7 @@
 'use strict';
 
-const service        = require('./international.service');
-const { sendSuccess } = require('../../shared/utils/response');
+const service                    = require('./international.service');
+const { sendSuccess, sendCreated } = require('../../shared/utils/response');
 
 async function getAll(req, res) {
   const filters = {
@@ -24,4 +24,14 @@ async function getOne(req, res) {
   sendSuccess(res, teacher);
 }
 
-module.exports = { getAll, getOne };
+async function create(req, res) {
+  const teacher = await service.create(req.body);
+  sendCreated(res, teacher);
+}
+
+async function update(req, res) {
+  const teacher = await service.update(req.params.id, req.body);
+  sendSuccess(res, teacher);
+}
+
+module.exports = { getAll, getOne, create, update };
