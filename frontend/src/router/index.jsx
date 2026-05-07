@@ -14,6 +14,9 @@ import FatherFormPage from "../pages/private/FatherFormPage";
 import RectorListPage from "../pages/private/RectorListPage";
 import RectorDetailPage from "../pages/private/RectorDetailPage";
 import RectorFormPage from "../pages/private/RectorFormPage";
+import InternationalTeacherListPage from "../pages/international/InternationalTeacherListPage";
+import InternationalTeacherDetailPage from "../pages/international/InternationalTeacherDetailPage";
+import InternationalTeacherFormPage from "../pages/international/InternationalTeacherFormPage";
 
 const router = createBrowserRouter([
   // ── Public ────────────────────────────────────────────────────────────────
@@ -56,7 +59,10 @@ const router = createBrowserRouter([
           {
             element: <RoleGuard roles={["admin_international"]} />,
             children: [
-              { path: "international/teachers", element: <Dashboard /> },
+              { path: "international/teachers",          element: <InternationalTeacherListPage /> },
+              { path: "international/teachers/new",      element: <InternationalTeacherFormPage /> },
+              { path: "international/teachers/:id",      element: <InternationalTeacherDetailPage /> },
+              { path: "international/teachers/:id/edit", element: <InternationalTeacherFormPage /> },
             ],
           },
 

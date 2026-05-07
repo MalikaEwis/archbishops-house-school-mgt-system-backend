@@ -1,0 +1,171 @@
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { fetchInternationalTeacher } from '../../api/internationalTeachers';
+import styles from '../private/TeacherDetailPage.module.css';
+
+export default function InternationalTeacherDetailPage() {
+  const { id }   = useParams();
+  const navigate = useNavigate();
+
+  const [teacher, setTeacher] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error,   setError]   = useState('');
+
+  useEffect(() => {
+    setLoading(true);
+    setError('');
+    fetchInternationalTeacher(id)
+      .then(setTeacher)
+      .catch((err) =>
+        setError(err.response?.data?.message ?? 'Failed to load teacher.'),
+      )
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className={styles.page}>
+        <button className={styles.backBtn} onClick={() => navigate('/international/teachers')}>
+          ← Back to list
+        </button>
+        <p className={styles.stateMsg}>Loading…</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={styles.page}>
+        <button className={styles.backBtn} onClick={() => navigate('/international/teachers')}>
+          ← Back to list
+        </button>
+        <p className={styles.error}>{error}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.page}>
+      {/* ── Toolbar ───────────────────────────────────────────────────────── */}
+      <div className={styles.toolbar}>
+        <button className={styles.backBtn} onClick={() => navigate('/international/teachers')}>
+          ← Back to list
+        </button>
+        <button
+          className={styles.editBtn}
+          onClick={() => navigate(`/international/teachers/${teacher.id}/edit`)}
+        >
+          Edit
+        </button>
+      </div>
+
+      {/* ── Title ─────────────────────────────────────────────────────────── */}
+      <div className={styles.titleRow}>
+        <h1 className={styles.heading}>{teacher.full_name}</h1>
+        <span className={teacher.is_active ? styles.badgeActive : styles.badgeRemoved}>
+          {teacher.is_active ? 'Active' : 'Removed'}
+        </span>
+      </div>
+
+      {/* ── Identity ──────────────────────────────────────────────────────── */}
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Identity</h2>
+        <dl className={styles.grid}>
+          <Field label="TIN"         value={teacher.tin}  mono />
+          <Field label="Category"    value={fmtCategory(teacher.category)} />
+          <Field label="Designation" value={teacher.designation} />
+          <Field label="NIC"         value={teacher.nic}  mono />
+          <Field label="Religion"    value={teacher.religion} />
+          <Field label="Email"       value={teacher.email} />
+          <Field label="Address"     value={teacher.address} />
+        </dl>
+      </section>
+
+      {/* ── Employment ────────────────────────────────────────────────────── */}
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Employment</h2>
+        <dl className={styles.grid}>
+          <Field label="School"              value={teacher.school_name} />
+          <Field label="Date of birth"       value={fmtDate(teacher.date_of_birth)} />
+          <Field label="Age"                 value={teacher.age != null ? `${teacher.age} yrs` : null} />
+          <Field label="First appointment"   value={fmtDate(teacher.date_of_first_appointment)} />
+          <Field
+            label="Service"
+            value={
+              teacher.service_years != null
+                ? `${teacher.service_years} yr${teacher.service_years !== 1 ? 's' : ''}${
+                    teacher.service_months ? ` ${teacher.service_months} mo` : ''
+                  }`
+                : null
+            }
+          />
+          <Field label="Retirement date" value={fmtDate(teacher.retirement_date)} />
+        </dl>
+      </section>
+
+      {/* ── Phones ────────────────────────────────────────────────────────── */}
+      {teacher.phones && teacher.phones.length > 0 && (
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Phone Numbers</h2>
+          <dl className={styles.grid}>
+            {teacher.phones.map((p) => (
+              <Field
+                key={p.id}
+                label={`${p.phone_type}${p.is_primary ? ' (Primary)' : ''}`}
+                value={p.phone_number}
+                mono
+              />
+            ))}
+          </dl>
+        </section>
+      )}
+
+      {/* ── Contract ──────────────────────────────────────────────────────── */}
+      {teacher.contract && (
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Contract</h2>
+          <dl className={styles.grid}>
+            {teacher.category === 'Permanent' ? (
+              <>
+                <Field label="Probation start" value={fmtDate(teacher.contract.probation_start)} />
+                <Field label="Probation end"   value={fmtDate(teacher.contract.probation_end)} />
+              </>
+            ) : (
+              <>
+                <Field label="Contract start"  value={fmtDate(teacher.contract.contract_start)} />
+                <Field label="Contract end"    value={fmtDate(teacher.contract.contract_end)} />
+                <Field label="Contract expiry" value={fmtDate(teacher.contract.contract_expiry)} />
+              </>
+            )}
+          </dl>
+        </section>
+      )}
+    </div>
+  );
+}
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function fmtDate(val) {
+  if (!val) return null;
+  const d = new Date(val);
+  return isNaN(d)
+    ? val
+    : d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function fmtCategory(val) {
+  if (!val) return null;
+  return val === 'Fixed_Term_Contract' ? 'Fixed Term Contract' : val;
+}
+
+function Field({ label, value, mono }) {
+  return (
+    <>
+      <dt className={styles.dt}>{label}</dt>
+      <dd className={[styles.dd, mono ? styles.mono : ''].join(' ')}>
+        {value ?? <span className={styles.nil}>—</span>}
+      </dd>
+    </>
+  );
+}
