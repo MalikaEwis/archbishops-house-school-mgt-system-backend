@@ -16,7 +16,7 @@ export default function RoleGuard({ roles }) {
   const { user } = useAuth();
 
   if (!roles.includes(user?.role)) {
-    return <Navigate to={getRoleHome(user?.role)} replace />;
+    return <Navigate to={getRoleHome(user?.role, user?.school_type)} replace />;
   }
 
   return <Outlet />;

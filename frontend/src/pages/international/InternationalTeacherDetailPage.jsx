@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchInternationalTeacher } from '../../api/internationalTeachers';
+import { useAuth } from '../../auth/AuthContext';
 import styles from '../private/TeacherDetailPage.module.css';
 
 export default function InternationalTeacherDetailPage() {
   const { id }   = useParams();
   const navigate = useNavigate();
+
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin_international';
 
   const [teacher, setTeacher] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -51,12 +55,14 @@ export default function InternationalTeacherDetailPage() {
         <button className={styles.backBtn} onClick={() => navigate('/international/teachers')}>
           ← Back to list
         </button>
-        <button
-          className={styles.editBtn}
-          onClick={() => navigate(`/international/teachers/${teacher.id}/edit`)}
-        >
-          Edit
-        </button>
+        {isAdmin && (
+          <button
+            className={styles.editBtn}
+            onClick={() => navigate(`/international/teachers/${teacher.id}/edit`)}
+          >
+            Edit
+          </button>
+        )}
       </div>
 
       {/* ── Title ─────────────────────────────────────────────────────────── */}

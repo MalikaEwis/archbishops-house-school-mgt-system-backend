@@ -17,6 +17,7 @@ import RectorFormPage from "../pages/private/RectorFormPage";
 import InternationalTeacherListPage from "../pages/international/InternationalTeacherListPage";
 import InternationalTeacherDetailPage from "../pages/international/InternationalTeacherDetailPage";
 import InternationalTeacherFormPage from "../pages/international/InternationalTeacherFormPage";
+import VestedSchoolListPage from "../pages/vested/VestedSchoolListPage";
 
 const router = createBrowserRouter([
   // ── Public ────────────────────────────────────────────────────────────────
@@ -69,15 +70,24 @@ const router = createBrowserRouter([
           // Vested school admins
           {
             element: <RoleGuard roles={["admin_vested"]} />,
-            children: [{ path: "vested/schools", element: <Dashboard /> }],
+            children: [{ path: "vested/schools", element: <VestedSchoolListPage /> }],
           },
 
-          // Principal / Head of HR — own school only, view-only
+          // Principal / Head of HR (Private) — own school only, view-only
           {
             element: <RoleGuard roles={["principal", "head_of_hr"]} />,
             children: [
-              { path: "my-school/teachers",      element: <TeacherListPage /> },
-              { path: "my-school/teachers/:id",  element: <TeacherDetailPage /> },
+              { path: "my-school/teachers",     element: <TeacherListPage /> },
+              { path: "my-school/teachers/:id", element: <TeacherDetailPage /> },
+            ],
+          },
+
+          // Principal / Head of HR (International) — own school only, view-only
+          {
+            element: <RoleGuard roles={["principal", "head_of_hr"]} />,
+            children: [
+              { path: "my-school/international/teachers",     element: <InternationalTeacherListPage /> },
+              { path: "my-school/international/teachers/:id", element: <InternationalTeacherDetailPage /> },
             ],
           },
 

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { fetchInternationalTeachers } from '../../api/internationalTeachers';
+import { useAuth } from '../../auth/AuthContext';
 import Pagination from '../../components/Pagination';
 import styles from '../private/TeacherListPage.module.css';
 
@@ -25,7 +26,11 @@ const PAGE_LIMIT = 20;
 
 export default function InternationalTeacherListPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  const isAdmin = user?.role === 'admin_international';
+  const basePath = isAdmin ? '/international/teachers' : '/my-school/international/teachers';
 
   // ── Filter state ─────────────────────────────────────────────────────────
   const [nameInput, setNameInput] = useState(searchParams.get('name') ?? '');
@@ -101,12 +106,14 @@ export default function InternationalTeacherListPage() {
             </p>
           )}
         </div>
-        <button
-          className={styles.createBtn}
-          onClick={() => navigate('/international/teachers/new')}
-        >
-          + Create Teacher
-        </button>
+        {isAdmin && (
+          <button
+            className={styles.createBtn}
+            onClick={() => navigate('/international/teachers/new')}
+          >
+            + Create Teacher
+          </button>
+        )}
       </div>
 
       {/* ── Filters ───────────────────────────────────────────────────────── */}
@@ -182,7 +189,7 @@ export default function InternationalTeacherListPage() {
                 <td>
                   <button
                     className={styles.viewBtn}
-                    onClick={() => navigate(`/international/teachers/${t.id}`)}
+                    onClick={() => navigate(`${basePath}/${t.id}`)}
                   >
                     View
                   </button>

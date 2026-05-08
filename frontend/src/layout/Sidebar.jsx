@@ -17,22 +17,26 @@ const NAV_BY_ROLE = {
     { label: 'Rectors',  to: '/private/rectors' },
   ],
   admin_international: [
-    { label: 'Teachers',   to: '/international/teachers' },
+    { label: 'Teachers', to: '/international/teachers' },
   ],
   admin_vested: [
-    { label: 'Schools',    to: '/vested/schools' },
-  ],
-  principal: [
-    { label: 'Teachers', to: '/my-school/teachers' },
-  ],
-  head_of_hr: [
-    { label: 'Teachers', to: '/my-school/teachers' },
+    { label: 'Schools',  to: '/vested/schools' },
   ],
 };
 
+function getNavItems(user) {
+  if (!user) return [];
+  if (user.role === 'principal' || user.role === 'head_of_hr') {
+    return user.school_type === 'International'
+      ? [{ label: 'Teachers', to: '/my-school/international/teachers' }]
+      : [{ label: 'Teachers', to: '/my-school/teachers' }];
+  }
+  return NAV_BY_ROLE[user.role] ?? [];
+}
+
 export default function Sidebar() {
   const { user } = useAuth();
-  const navItems = NAV_BY_ROLE[user?.role] ?? [];
+  const navItems = getNavItems(user);
   const section  = ROLE_LABELS[user?.role] ?? 'Dashboard';
 
   return (

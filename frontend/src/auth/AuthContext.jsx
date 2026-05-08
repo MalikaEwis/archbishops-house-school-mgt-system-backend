@@ -4,16 +4,22 @@ import client from '../api/client';
 const AuthContext = createContext(null);
 
 /**
- * Maps a backend role string to the user's home route.
+ * Maps a backend role + school_type to the user's home route.
  * Used after login and in RoleGuard to redirect to the right section.
+ *
+ * @param {string} role
+ * @param {string|null} schoolType  - 'Private' | 'International' | 'Vested' | null
  */
-export function getRoleHome(role) {
+export function getRoleHome(role, schoolType) {
   switch (role) {
     case 'admin_private':       return '/private/teachers';
     case 'admin_international': return '/international/teachers';
     case 'admin_vested':        return '/vested/schools';
     case 'principal':
-    case 'head_of_hr':          return '/my-school/teachers';
+    case 'head_of_hr':
+      return schoolType === 'International'
+        ? '/my-school/international/teachers'
+        : '/my-school/teachers';
     default:                    return '/dashboard';
   }
 }

@@ -16,7 +16,7 @@ export default function Login() {
   // If already authenticated, redirect immediately
   useEffect(() => {
     if (user) {
-      const dest = location.state?.from?.pathname ?? getRoleHome(user.role);
+      const dest = location.state?.from?.pathname ?? getRoleHome(user.role, user.school_type);
       navigate(dest, { replace: true });
     }
   }, [user, navigate, location]);
@@ -27,7 +27,7 @@ export default function Login() {
     setBusy(true);
     try {
       const loggedIn = await login(username.trim(), password);
-      const dest = location.state?.from?.pathname ?? getRoleHome(loggedIn.role);
+      const dest = location.state?.from?.pathname ?? getRoleHome(loggedIn.role, loggedIn.school_type);
       navigate(dest, { replace: true });
     } catch (err) {
       const msg = err.response?.data?.message ?? 'Login failed. Please check your credentials.';
