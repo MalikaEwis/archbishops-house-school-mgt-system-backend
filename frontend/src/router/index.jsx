@@ -17,7 +17,8 @@ import RectorFormPage from "../pages/private/RectorFormPage";
 import InternationalTeacherListPage from "../pages/international/InternationalTeacherListPage";
 import InternationalTeacherDetailPage from "../pages/international/InternationalTeacherDetailPage";
 import InternationalTeacherFormPage from "../pages/international/InternationalTeacherFormPage";
-import VestedSchoolListPage from "../pages/vested/VestedSchoolListPage";
+import VestedSchoolListPage   from "../pages/vested/VestedSchoolListPage";
+import VestedSchoolDetailPage from "../pages/vested/VestedSchoolDetailPage";
 
 const router = createBrowserRouter([
   // ── Public ────────────────────────────────────────────────────────────────
@@ -70,7 +71,10 @@ const router = createBrowserRouter([
           // Vested school admins
           {
             element: <RoleGuard roles={["admin_vested"]} />,
-            children: [{ path: "vested/schools", element: <VestedSchoolListPage /> }],
+            children: [
+              { path: "vested/schools",     element: <VestedSchoolListPage /> },
+              { path: "vested/schools/:id", element: <VestedSchoolDetailPage /> },
+            ],
           },
 
           // Principal / Head of HR (Private) — own school only, view-only
