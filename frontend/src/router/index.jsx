@@ -19,6 +19,7 @@ import InternationalTeacherDetailPage from "../pages/international/International
 import InternationalTeacherFormPage from "../pages/international/InternationalTeacherFormPage";
 import VestedSchoolListPage   from "../pages/vested/VestedSchoolListPage";
 import VestedSchoolDetailPage from "../pages/vested/VestedSchoolDetailPage";
+import VestedSchoolFormPage   from "../pages/vested/VestedSchoolFormPage";
 
 const router = createBrowserRouter([
   // ── Public ────────────────────────────────────────────────────────────────
@@ -72,8 +73,10 @@ const router = createBrowserRouter([
           {
             element: <RoleGuard roles={["admin_vested"]} />,
             children: [
-              { path: "vested/schools",     element: <VestedSchoolListPage /> },
-              { path: "vested/schools/:id", element: <VestedSchoolDetailPage /> },
+              { path: "vested/schools",          element: <VestedSchoolListPage /> },
+              { path: "vested/schools/new",      element: <VestedSchoolFormPage /> },
+              { path: "vested/schools/:id",      element: <VestedSchoolDetailPage /> },
+              { path: "vested/schools/:id/edit", element: <VestedSchoolFormPage /> },
             ],
           },
 
