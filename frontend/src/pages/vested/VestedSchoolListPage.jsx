@@ -63,7 +63,7 @@ export default function VestedSchoolListPage() {
   function handleNameChange(val) {
     setNameInput(val);
     clearTimeout(nameDebounce.current);
-    nameDebounce.current = setTimeout(() => setName(val), 400);
+    nameDebounce.current = setTimeout(() => setName(val), 300);
   }
 
   // ── Data state ────────────────────────────────────────────────────────────
@@ -193,8 +193,10 @@ export default function VestedSchoolListPage() {
             <tr>
               <th>Index</th>
               <th>School Name</th>
-              <th>Zone</th>
+              <th>Province</th>
               <th>District</th>
+              <th>Zone</th>
+              <th>Region</th>
               <th>Current Principal</th>
               <th>Total Students</th>
               <th>Catholic %</th>
@@ -204,25 +206,27 @@ export default function VestedSchoolListPage() {
           <tbody>
             {loading && (
               <tr>
-                <td colSpan={8} className={styles.stateCell}>Loading…</td>
+                <td colSpan={10} className={styles.stateCell}>Loading…</td>
               </tr>
             )}
             {!loading && schools.length === 0 && (
               <tr>
-                <td colSpan={8} className={styles.stateCell}>No schools found.</td>
+                <td colSpan={10} className={styles.stateCell}>No schools found.</td>
               </tr>
             )}
             {!loading && schools.map((s) => (
               <tr key={s.id}>
                 <td className={styles.mono}>{s.school_index}</td>
                 <td>{s.school_name}</td>
-                <td>{s.zone ?? '—'}</td>
-                <td>{s.district ?? '—'}</td>
+                <td>{s.province ?? <span className={styles.nil}>—</span>}</td>
+                <td>{s.district ?? <span className={styles.nil}>—</span>}</td>
+                <td>{s.zone    ?? <span className={styles.nil}>—</span>}</td>
+                <td>{s.region  ?? <span className={styles.nil}>—</span>}</td>
                 <td>{s.current_principal_name ?? <span className={styles.nil}>—</span>}</td>
-                <td>{s.latest_total_students ?? <span className={styles.nil}>—</span>}</td>
+                <td>{s.latest_total_students  ?? <span className={styles.nil}>—</span>}</td>
                 <td>
                   {s.latest_pct_catholic != null
-                    ? `${s.latest_pct_catholic}%`
+                    ? `${parseFloat(s.latest_pct_catholic).toFixed(1)}%`
                     : <span className={styles.nil}>—</span>
                   }
                 </td>
