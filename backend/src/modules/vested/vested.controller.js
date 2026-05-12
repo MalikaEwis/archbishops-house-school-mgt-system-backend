@@ -75,6 +75,15 @@ async function archivePrincipal(req, res) {
   return sendSuccess(res, principal, 'Principal archived successfully');
 }
 
+// POST /api/vested/schools/:id/principals/:pid/restore
+async function restorePrincipal(req, res) {
+  const principal = await vestedService.restorePrincipal(
+    req.params.id,
+    req.params.pid,
+  );
+  return sendSuccess(res, principal, 'Principal restored successfully');
+}
+
 // ─── Student Stats ────────────────────────────────────────────────────────────
 
 // GET /api/vested/schools/:id/stats
@@ -123,6 +132,7 @@ module.exports = {
   addPrincipal,
   updatePrincipal,
   archivePrincipal,
+  restorePrincipal,
   // Stats
   getStats,
   upsertStats,

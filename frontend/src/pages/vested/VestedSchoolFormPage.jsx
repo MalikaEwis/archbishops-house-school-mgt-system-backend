@@ -552,11 +552,11 @@ export default function VestedSchoolFormPage() {
           </Field>
         </fieldset>
 
-        {/* ── Remarks & Overview ────────────────────────────────────────── */}
+        {/* ── Overview of School Highlighting ───────────────────────────── */}
         <fieldset className={styles.fieldset}>
-          <legend className={styles.legend}>Remarks &amp; Overview</legend>
+          <legend className={styles.legend}>Overview of School Highlighting</legend>
 
-          <Field label="General">
+          <Field label="Vesting information">
             <textarea
               name="overview_general"
               className={styles.input}
@@ -568,7 +568,7 @@ export default function VestedSchoolFormPage() {
             />
           </Field>
 
-          <Field label="Remarks">
+          <Field label="Arbitration info">
             <textarea
               name="overview_remarks"
               className={styles.input}
@@ -580,7 +580,7 @@ export default function VestedSchoolFormPage() {
             />
           </Field>
 
-          <Field label="Special notes">
+          <Field label="Devesting info">
             <textarea
               name="overview_special_notes"
               className={styles.input}
@@ -592,7 +592,7 @@ export default function VestedSchoolFormPage() {
             />
           </Field>
 
-          <Field label="Challenges">
+          <Field label="Other remarks">
             <textarea
               name="overview_challenges"
               className={styles.input}

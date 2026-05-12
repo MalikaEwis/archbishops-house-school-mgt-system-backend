@@ -42,6 +42,11 @@ export async function archivePrincipal(schoolId, pid, body) {
   return data.data;
 }
 
+export async function restorePrincipal(schoolId, pid) {
+  const { data } = await client.post(`/vested/schools/${schoolId}/principals/${pid}/restore`);
+  return data.data;
+}
+
 export async function upsertStats(schoolId, body) {
   const { data } = await client.post(`/vested/schools/${schoolId}/stats`, body);
   return data.data;

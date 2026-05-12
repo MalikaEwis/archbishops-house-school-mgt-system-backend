@@ -509,6 +509,24 @@ async function archivePrincipal(principalId, data) {
   );
 }
 
+/**
+ * Restores an archived principal: sets is_current = 1 and clears archive fields.
+ * Caller is responsible for ensuring no other principal is currently active.
+ *
+ * @param {number} principalId
+ */
+async function restorePrincipal(principalId) {
+  const pool = getPool();
+  await pool.execute(
+    `UPDATE vested_school_principals
+     SET is_current       = 1,
+         end_date         = NULL,
+         departure_reason = NULL
+     WHERE id = ?`,
+    [principalId],
+  );
+}
+
 // ─── Student Stats ───────────────────────────────────────────────────────────
 
 const STATS_SELECT = `
@@ -653,6 +671,7 @@ module.exports = {
   insertPrincipal,
   updatePrincipal,
   archivePrincipal,
+  restorePrincipal,
 
   // Stats
   findStats,

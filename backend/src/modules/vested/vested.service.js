@@ -312,6 +312,46 @@ async function archivePrincipal(schoolId, principalId, body) {
   return repo.findPrincipalById(Number(principalId));
 }
 
+/**
+ * Restores an archived principal as the current principal (FR-51 unarchive).
+ *
+ * If another principal is currently active, they are automatically archived
+ * first (with no end_date or departure_reason recorded).
+ *
+ * @param {number|string} schoolId    schools.id
+ * @param {number|string} principalId
+ * @returns {Promise<object>} restored principal row
+ */
+async function restorePrincipal(schoolId, principalId) {
+  const school    = await requireSchool(schoolId);
+  const principal = await repo.findPrincipalById(Number(principalId));
+
+  if (!principal) throw new AppError('Principal not found.', 404);
+  if (principal.vested_school_id !== school.vested_id) {
+    throw new AppError('Principal does not belong to this school.', 403);
+  }
+  if (principal.is_current) {
+    throw new AppError('Principal is already active.', 409);
+  }
+
+  const pool = getPool();
+
+  // Auto-archive any existing current principal before restoring
+  const [existing] = await pool.execute(
+    'SELECT id FROM vested_school_principals WHERE vested_school_id = ? AND is_current = 1 LIMIT 1',
+    [school.vested_id],
+  );
+  if (existing[0]) {
+    await repo.archivePrincipal(existing[0].id, {
+      end_date:         null,
+      departure_reason: null,
+    });
+  }
+
+  await repo.restorePrincipal(Number(principalId));
+  return repo.findPrincipalById(Number(principalId));
+}
+
 // ─── Student Stats ───────────────────────────────────────────────────────────
 
 /**
@@ -381,6 +421,7 @@ module.exports = {
   addPrincipal,
   updatePrincipal,
   archivePrincipal,
+  restorePrincipal,
 
   // Stats
   getStats,

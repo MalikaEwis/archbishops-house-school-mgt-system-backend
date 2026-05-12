@@ -86,6 +86,13 @@ router.post(
   asyncHandler(ctrl.archivePrincipal),
 );
 
+// POST /api/vested/schools/:id/principals/:pid/restore
+router.post(
+  '/schools/:id/principals/:pid/restore',
+  authorize(...ROLE_GROUPS.VESTED_ADMINS),
+  asyncHandler(ctrl.restorePrincipal),
+);
+
 // ─── Student Stats ────────────────────────────────────────────────────────────
 
 // GET  /api/vested/schools/:id/stats
