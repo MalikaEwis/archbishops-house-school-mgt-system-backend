@@ -229,4 +229,20 @@ async function update(id, body) {
   }
 }
 
-module.exports = { findAll, findById, create, update };
+async function updateProfilePicture(id, filePath) {
+  const existing = await repo.findById(Number(id));
+  if (!existing)        throw new AppError('Teacher not found.', 404);
+  if (!existing.is_active) throw new AppError('Cannot update a removed teacher.', 409);
+  await repo.updateProfilePicture(Number(id), filePath);
+  return findById(Number(id), null);
+}
+
+async function removeProfilePicture(id) {
+  const existing = await repo.findById(Number(id));
+  if (!existing)        throw new AppError('Teacher not found.', 404);
+  if (!existing.is_active) throw new AppError('Cannot update a removed teacher.', 409);
+  await repo.updateProfilePicture(Number(id), null);
+  return findById(Number(id), null);
+}
+
+module.exports = { findAll, findById, create, update, updateProfilePicture, removeProfilePicture };

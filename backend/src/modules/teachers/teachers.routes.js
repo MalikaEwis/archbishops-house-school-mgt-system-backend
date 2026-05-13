@@ -84,12 +84,17 @@ router.delete(
 );
 
 // PUT /api/teachers/:id/profile-picture  — admin only
-// Note: multer runs inside the controller (not as express middleware here)
-// so that AppError handling is consistent with the rest of the error pipeline.
 router.put(
   '/:id/profile-picture',
   authorize(...ROLE_GROUPS.CAN_WRITE),
   asyncHandler(ctrl.uploadProfilePicture),
+);
+
+// DELETE /api/teachers/:id/profile-picture  — admin only
+router.delete(
+  '/:id/profile-picture',
+  authorize(...ROLE_GROUPS.CAN_WRITE),
+  asyncHandler(ctrl.removeProfilePicture),
 );
 
 // POST /api/teachers/:id/upgrade-category  — admin triggers FR-15 upgrade (3→2 or 2→1)

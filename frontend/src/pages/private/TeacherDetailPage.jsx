@@ -1,7 +1,12 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { fetchTeacher } from "../../api/teachers";
+import {
+  fetchTeacher,
+  uploadTeacherProfilePicture,
+  removeTeacherProfilePicture,
+} from "../../api/teachers";
 import { useAuth } from "../../auth/AuthContext";
+import ProfilePicture from "../../components/ProfilePicture";
 import styles from "./TeacherDetailPage.module.css";
 
 const READ_ONLY_ROLES = ["principal", "head_of_hr"];
@@ -122,6 +127,21 @@ export default function TeacherDetailPage() {
           Removed · reason: <strong>{teacher.removed_reason}</strong>
         </p>
       )}
+
+      {/* ── Profile Picture ──────────────────────────────────────────────── */}
+      <ProfilePicture
+        picturePath={teacher.profile_picture_path}
+        name={teacher.full_name}
+        isAdmin={!readOnly && !isRemoved}
+        onUpload={async (file) => {
+          const updated = await uploadTeacherProfilePicture(teacher.id, file);
+          setTeacher(updated);
+        }}
+        onRemove={async () => {
+          const updated = await removeTeacherProfilePicture(teacher.id);
+          setTeacher(updated);
+        }}
+      />
 
       {/* ── Core fields ─────────────────────────────────────────────────── */}
       <section className={styles.section}>

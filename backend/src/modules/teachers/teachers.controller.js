@@ -141,6 +141,14 @@ async function upgradeCategory(req, res) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// DELETE /api/teachers/:id/profile-picture  (admin only)
+// ─────────────────────────────────────────────────────────────────────────────
+async function removeProfilePicture(req, res) {
+  const teacher = await teachersService.removeProfilePicture(req.params.id);
+  return sendSuccess(res, teacher, 'Profile picture removed');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // DELETE /api/teachers/:id  — redirect to workflow
 // ─────────────────────────────────────────────────────────────────────────────
 async function remove(req, res) {
@@ -154,6 +162,7 @@ module.exports = {
   create,
   update,
   uploadProfilePicture,
+  removeProfilePicture,
   upgradeCategory,
   requestRemoval,
   approveRemoval,

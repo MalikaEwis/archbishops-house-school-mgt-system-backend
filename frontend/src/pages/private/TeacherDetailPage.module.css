@@ -232,3 +232,95 @@
   font-size: 0.875rem;
   margin: 0;
 }
+
+/* ── Profile Picture ─────────────────────────────────────────────────────── */
+.picSection {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  display: flex;
+  gap: 1.5rem;
+  padding: 1.25rem 1.5rem;
+}
+
+.avatarWrap {
+  flex-shrink: 0;
+}
+
+.avatar {
+  border: 2px solid #e5e7eb;
+  border-radius: 50%;
+  display: block;
+  height: 96px;
+  object-fit: cover;
+  width: 96px;
+}
+
+.avatarInitials {
+  align-items: center;
+  background: #ede9fe;
+  border: 2px solid #ddd6fe;
+  border-radius: 50%;
+  color: #5b21b6;
+  display: flex;
+  font-size: 1.75rem;
+  font-weight: 700;
+  height: 96px;
+  justify-content: center;
+  letter-spacing: 0.04em;
+  width: 96px;
+}
+
+.picActions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.picBtnRow {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.picBtn {
+  background: #4f46e5;
+  border: 1px solid #4f46e5;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 0.35rem 0.75rem;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.picBtn:hover:not(:disabled) {
+  background: #4338ca;
+  border-color: #4338ca;
+}
+
+.picBtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.picBtnDanger {
+  background: #fff;
+  border-color: #fca5a5;
+  color: #b91c1c;
+}
+
+.picBtnDanger:hover:not(:disabled) {
+  background: #fef2f2;
+}
+
+.fileInput {
+  display: none;
+}
+
+.picError {
+  color: #b91c1c;
+  font-size: 0.8rem;
+  margin: 0;
+}

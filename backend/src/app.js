@@ -3,6 +3,7 @@
 const express  = require('express');
 const helmet   = require('helmet');
 const cors     = require('cors');
+const path     = require('path');
 
 const config         = require('./config/env');
 const routes         = require('./routes');
@@ -36,6 +37,9 @@ app.get('/health', (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+// ─── Static uploads (profile pictures, etc.) ─────────────────────────────────
+app.use('/uploads', express.static(path.resolve(config.upload.dir)));
 
 // ─── API routes ───────────────────────────────────────────────────────────────
 app.use('/api', routes);

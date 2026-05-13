@@ -1,7 +1,9 @@
 'use strict';
 
-const service                    = require('./international.service');
+const service                        = require('./international.service');
+const { handleProfilePictureUpload } = require('./international.upload');
 const { sendSuccess, sendCreated } = require('../../shared/utils/response');
+const path                           = require('path');
 
 async function getAll(req, res) {
   const filters = {
@@ -34,4 +36,20 @@ async function update(req, res) {
   sendSuccess(res, teacher);
 }
 
-module.exports = { getAll, getOne, create, update };
+async function uploadProfilePicture(req, res) {
+  await handleProfilePictureUpload(req, res);
+  if (!req.file) {
+    const AppError = require('../../shared/utils/AppError');
+    throw new AppError('No file uploaded.', 400);
+  }
+  const relativePath = path.join('profile-pictures', req.file.filename).replace(/\\/g, '/');
+  const teacher = await service.updateProfilePicture(req.params.id, relativePath);
+  return sendSuccess(res, teacher, 'Profile picture updated');
+}
+
+async function removeProfilePicture(req, res) {
+  const teacher = await service.removeProfilePicture(req.params.id);
+  return sendSuccess(res, teacher, 'Profile picture removed');
+}
+
+module.exports = { getAll, getOne, create, update, uploadProfilePicture, removeProfilePicture };

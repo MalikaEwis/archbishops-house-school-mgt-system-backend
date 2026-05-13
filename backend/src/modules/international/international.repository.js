@@ -47,6 +47,7 @@ const BASE_SELECT = `
     t.date_of_birth,
     t.date_of_first_appointment,
     t.school_id,
+    t.profile_picture_path,
     t.is_active,
     t.removed_at,
     t.removed_reason,
@@ -219,6 +220,7 @@ async function updateTeacher(id, data, conn) {
     'address',
     'email',
     'date_of_first_appointment',
+    'profile_picture_path',
   ];
 
   const sets   = [];
@@ -435,6 +437,14 @@ async function setSubjects(teacherId, subjects, conn) {
 // Exports
 // ─────────────────────────────────────────────────────────────────────────────
 
+async function updateProfilePicture(id, filePath) {
+  const pool = getPool();
+  await pool.execute(
+    'UPDATE international_school_teachers SET profile_picture_path = ? WHERE id = ? AND is_active = 1',
+    [filePath, id],
+  );
+}
+
 module.exports = {
   // Read
   findAll,
@@ -451,6 +461,7 @@ module.exports = {
   insertTeacher,
   reactivateVacantRow,
   updateTeacher,
+  updateProfilePicture,
   // Write (satellite)
   setPhones,
   upsertContract,

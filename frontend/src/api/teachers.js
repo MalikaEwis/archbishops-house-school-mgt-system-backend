@@ -30,3 +30,17 @@ export async function fetchTeacher(id) {
   const { data } = await client.get(`/teachers/${id}`);
   return data.data;
 }
+
+export async function uploadTeacherProfilePicture(id, file) {
+  const form = new FormData();
+  form.append('profile_picture', file);
+  const { data } = await client.put(`/teachers/${id}/profile-picture`, form, {
+    headers: { 'Content-Type': undefined },
+  });
+  return data.data;
+}
+
+export async function removeTeacherProfilePicture(id) {
+  const { data } = await client.delete(`/teachers/${id}/profile-picture`);
+  return data.data;
+}

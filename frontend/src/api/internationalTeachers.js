@@ -22,3 +22,17 @@ export async function updateInternationalTeacher(id, body) {
   const { data } = await client.patch(`/international-teachers/${id}`, body);
   return data.data;
 }
+
+export async function uploadInternationalTeacherProfilePicture(id, file) {
+  const form = new FormData();
+  form.append('profile_picture', file);
+  const { data } = await client.put(`/international-teachers/${id}/profile-picture`, form, {
+    headers: { 'Content-Type': undefined },
+  });
+  return data.data;
+}
+
+export async function removeInternationalTeacherProfilePicture(id) {
+  const { data } = await client.delete(`/international-teachers/${id}/profile-picture`);
+  return data.data;
+}

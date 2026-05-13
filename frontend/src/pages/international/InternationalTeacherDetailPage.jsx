@@ -1,7 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchInternationalTeacher } from '../../api/internationalTeachers';
+import {
+  fetchInternationalTeacher,
+  uploadInternationalTeacherProfilePicture,
+  removeInternationalTeacherProfilePicture,
+} from '../../api/internationalTeachers';
 import { useAuth } from '../../auth/AuthContext';
+import ProfilePicture from '../../components/ProfilePicture';
 import styles from '../private/TeacherDetailPage.module.css';
 
 export default function InternationalTeacherDetailPage() {
@@ -72,6 +77,21 @@ export default function InternationalTeacherDetailPage() {
           {teacher.is_active ? 'Active' : 'Removed'}
         </span>
       </div>
+
+      {/* ── Profile Picture ───────────────────────────────────────────────── */}
+      <ProfilePicture
+        picturePath={teacher.profile_picture_path}
+        name={teacher.full_name}
+        isAdmin={isAdmin && teacher.is_active}
+        onUpload={async (file) => {
+          const updated = await uploadInternationalTeacherProfilePicture(teacher.id, file);
+          setTeacher(updated);
+        }}
+        onRemove={async () => {
+          const updated = await removeInternationalTeacherProfilePicture(teacher.id);
+          setTeacher(updated);
+        }}
+      />
 
       {/* ── Identity ──────────────────────────────────────────────────────── */}
       <section className={styles.section}>

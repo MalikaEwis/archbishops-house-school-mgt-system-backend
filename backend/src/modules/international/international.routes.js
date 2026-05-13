@@ -41,4 +41,18 @@ router.patch(
   asyncHandler(ctrl.update),
 );
 
+// PUT /api/international-teachers/:id/profile-picture
+router.put(
+  '/:id/profile-picture',
+  authorize(...ROLE_GROUPS.INTERNATIONAL_ADMINS),
+  asyncHandler(ctrl.uploadProfilePicture),
+);
+
+// DELETE /api/international-teachers/:id/profile-picture
+router.delete(
+  '/:id/profile-picture',
+  authorize(...ROLE_GROUPS.INTERNATIONAL_ADMINS),
+  asyncHandler(ctrl.removeProfilePicture),
+);
+
 module.exports = router;

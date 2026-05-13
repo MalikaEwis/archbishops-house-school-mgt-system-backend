@@ -609,12 +609,21 @@ async function remove(id, adminId) {
   );
 }
 
+async function removeProfilePicture(id) {
+  const existing = await repo.findById(Number(id));
+  if (!existing)        throw new AppError('Teacher not found.', 404);
+  if (!existing.is_active) throw new AppError('Cannot update a removed teacher.', 409);
+  await repo.updateTeacher(Number(id), { profile_picture_path: null });
+  return findById(Number(id), null);
+}
+
 module.exports = {
   findAll,
   findById,
   create,
   update,
   updateProfilePicture,
+  removeProfilePicture,
   upgradeCategory,
   remove,
   requestRemoval,
