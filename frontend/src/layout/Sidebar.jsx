@@ -12,9 +12,10 @@ const ROLE_LABELS = {
 
 const NAV_BY_ROLE = {
   admin_private: [
-    { label: 'Teachers', to: '/private/teachers' },
-    { label: 'Fathers',  to: '/private/fathers' },
-    { label: 'Rectors',  to: '/private/rectors' },
+    { label: 'Teachers',         to: '/private/teachers' },
+    { label: 'Fathers',          to: '/private/fathers' },
+    { label: 'Rectors',          to: '/private/rectors' },
+    { label: 'Removal Requests', to: '/private/removal-requests' },
   ],
   admin_international: [
     { label: 'Teachers', to: '/international/teachers' },

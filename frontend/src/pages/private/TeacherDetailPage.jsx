@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import {
   fetchTeacher,
   uploadTeacherProfilePicture,
   removeTeacherProfilePicture,
+  requestTeacherRemoval,
+  fetchRemovalRequests,
 } from "../../api/teachers";
 import { useAuth } from "../../auth/AuthContext";
 import ProfilePicture from "../../components/ProfilePicture";
@@ -37,6 +40,13 @@ const DCETT_LABELS = {
   Completed:     "Completed",
 };
 
+const REASON_LABELS = {
+  Resignation:           "Resignation",
+  Retirement:            "Retirement",
+  Transfer:              "Transfer",
+  Qualification_Failure: "Qualification Failure",
+};
+
 function fmtAttempt(val) {
   return val ?? "Not Participated";
 }
@@ -51,17 +61,26 @@ export default function TeacherDetailPage() {
   const [teacher, setTeacher] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [pendingRequest, setPendingRequest] = useState(null);
 
   useEffect(() => {
     setLoading(true);
     setError("");
-    fetchTeacher(id)
-      .then(setTeacher)
+    const teacherFetch = fetchTeacher(id);
+    const pendingFetch = !readOnly
+      ? fetchRemovalRequests({ teacherId: id, status: "Pending" })
+      : Promise.resolve([]);
+
+    Promise.all([teacherFetch, pendingFetch])
+      .then(([teacherData, pendingData]) => {
+        setTeacher(teacherData);
+        setPendingRequest(pendingData[0] ?? null);
+      })
       .catch((err) =>
         setError(err.response?.data?.message ?? "Failed to load teacher."),
       )
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, readOnly]);
 
   // ── Loading ────────────────────────────────────────────────────────────────
   if (loading) {
@@ -89,6 +108,59 @@ export default function TeacherDetailPage() {
 
   const isRemoved = !teacher.is_active;
 
+  async function handleRequestRemoval() {
+    const { value: reason } = await Swal.fire({
+      title: "Request Teacher Removal",
+      html: `
+        <select id="swal-reason" class="swal2-select" style="width:100%;margin-top:0.5rem">
+          <option value="" disabled selected>Select reason…</option>
+          <option value="Resignation">Resignation</option>
+          <option value="Retirement">Retirement</option>
+          <option value="Transfer">Transfer</option>
+          <option value="Qualification_Failure">Qualification Failure</option>
+        </select>
+      `,
+      focusConfirm: false,
+      preConfirm: () => {
+        const val = document.getElementById("swal-reason").value;
+        if (!val) {
+          Swal.showValidationMessage("Please select a reason.");
+          return false;
+        }
+        return val;
+      },
+      confirmButtonText: "Submit Request",
+      confirmButtonColor: "#b91c1c",
+      showCancelButton: true,
+      cancelButtonColor: "#6b7280",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!reason) return;
+
+    try {
+      const result = await requestTeacherRemoval(teacher.id, reason);
+      setPendingRequest({
+        ...result,
+        reason,
+        requested_by_username: user?.username,
+      });
+      await Swal.fire({
+        title: "Request submitted",
+        text: "The removal request is now pending approval by a second admin.",
+        icon: "success",
+        confirmButtonColor: "#4f46e5",
+      });
+    } catch (err) {
+      await Swal.fire({
+        title: "Error",
+        text: err.response?.data?.message ?? "Failed to submit removal request.",
+        icon: "error",
+        confirmButtonColor: "#4f46e5",
+      });
+    }
+  }
+
   return (
     <div className={styles.page}>
       {/* ── Toolbar ─────────────────────────────────────────────────────── */}
@@ -105,8 +177,12 @@ export default function TeacherDetailPage() {
             >
               Edit
             </button>
-            <button className={styles.removalBtn} disabled={isRemoved}>
-              Request Removal
+            <button
+              className={styles.removalBtn}
+              disabled={isRemoved || !!pendingRequest}
+              onClick={handleRequestRemoval}
+            >
+              {pendingRequest ? "Removal Pending" : "Request Removal"}
             </button>
           </div>
         )}
@@ -124,7 +200,15 @@ export default function TeacherDetailPage() {
 
       {isRemoved && teacher.removed_reason && (
         <p className={styles.removedNote}>
-          Removed · reason: <strong>{teacher.removed_reason}</strong>
+          Removed · reason: <strong>{REASON_LABELS[teacher.removed_reason] ?? teacher.removed_reason}</strong>
+        </p>
+      )}
+
+      {pendingRequest && !isRemoved && (
+        <p className={styles.removedNote} style={{ background: "#fffbeb", borderColor: "#fde68a", color: "#92400e" }}>
+          Removal pending · Requested by <strong>{pendingRequest.requested_by_username ?? "an admin"}</strong> ·
+          Reason: <strong>{REASON_LABELS[pendingRequest.reason] ?? pendingRequest.reason}</strong> ·
+          Awaiting a second admin to approve.
         </p>
       )}
 
@@ -274,7 +358,6 @@ export default function TeacherDetailPage() {
 
 function fmtDate(val) {
   if (!val) return null;
-  // ISO date string → locale date (no time)
   const d = new Date(val);
   return isNaN(d)
     ? val

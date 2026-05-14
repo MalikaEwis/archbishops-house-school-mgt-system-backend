@@ -17,6 +17,7 @@ import RectorFormPage from "../pages/private/RectorFormPage";
 import InternationalTeacherListPage from "../pages/international/InternationalTeacherListPage";
 import InternationalTeacherDetailPage from "../pages/international/InternationalTeacherDetailPage";
 import InternationalTeacherFormPage from "../pages/international/InternationalTeacherFormPage";
+import RemovalRequestsPage from "../pages/private/RemovalRequestsPage";
 import VestedSchoolListPage   from "../pages/vested/VestedSchoolListPage";
 import VestedSchoolDetailPage from "../pages/vested/VestedSchoolDetailPage";
 import VestedSchoolFormPage   from "../pages/vested/VestedSchoolFormPage";
@@ -45,11 +46,12 @@ const router = createBrowserRouter([
           {
             element: <RoleGuard roles={["admin_private"]} />,
             children: [
-              { path: "private/teachers",          element: <TeacherListPage /> },
-              { path: "private/teachers/new",       element: <TeacherFormPage /> },
-              { path: "private/teachers/:id",       element: <TeacherDetailPage /> },
-              { path: "private/teachers/:id/edit",  element: <TeacherFormPage /> },
-              { path: "private/fathers",            element: <FatherListPage /> },
+              { path: "private/teachers",            element: <TeacherListPage /> },
+              { path: "private/teachers/new",        element: <TeacherFormPage /> },
+              { path: "private/teachers/:id",        element: <TeacherDetailPage /> },
+              { path: "private/teachers/:id/edit",   element: <TeacherFormPage /> },
+              { path: "private/removal-requests",    element: <RemovalRequestsPage /> },
+              { path: "private/fathers",             element: <FatherListPage /> },
               { path: "private/fathers/:id",        element: <FatherDetailPage /> },
               { path: "private/fathers/:id/edit",   element: <FatherFormPage /> },
               { path: "private/rectors",            element: <RectorListPage /> },

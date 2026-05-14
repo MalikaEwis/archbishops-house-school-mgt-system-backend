@@ -44,3 +44,28 @@ export async function removeTeacherProfilePicture(id) {
   const { data } = await client.delete(`/teachers/${id}/profile-picture`);
   return data.data;
 }
+
+export async function requestTeacherRemoval(id, reason) {
+  const { data } = await client.post(`/teachers/${id}/removal-request`, { reason });
+  return data.data;
+}
+
+export async function fetchRemovalRequests(params = {}) {
+  const query = Object.fromEntries(
+    Object.entries(params).filter(([, v]) => v !== undefined && v !== ''),
+  );
+  const { data } = await client.get('/teachers/removal-requests', { params: query });
+  return data.data;
+}
+
+export async function approveRemovalRequest(requestId) {
+  const { data } = await client.post(`/teachers/removal-requests/${requestId}/approve`);
+  return data.data;
+}
+
+export async function rejectRemovalRequest(requestId, rejectionNote) {
+  const { data } = await client.post(`/teachers/removal-requests/${requestId}/reject`, {
+    rejection_note: rejectionNote ?? null,
+  });
+  return data.data;
+}

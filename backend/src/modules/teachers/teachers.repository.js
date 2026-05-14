@@ -820,21 +820,42 @@ async function findRemovalRequests(filters = {}) {
   const params = [];
 
   if (filters.teacherId) {
-    where.push("teacher_id = ?");
+    where.push('tra.teacher_id = ?');
     params.push(filters.teacherId);
   }
   if (filters.teacherType) {
-    where.push("teacher_type = ?");
+    where.push('tra.teacher_type = ?');
     params.push(filters.teacherType);
   }
   if (filters.status) {
-    where.push("status = ?");
+    where.push('tra.status = ?');
     params.push(filters.status);
   }
 
-  const whereClause = where.length ? `WHERE ${where.join(" AND ")}` : "";
+  const whereClause = where.length ? `WHERE ${where.join(' AND ')}` : '';
   const [rows] = await pool.execute(
-    `SELECT * FROM teacher_removal_approvals ${whereClause} ORDER BY requested_at DESC`,
+    `SELECT
+       tra.id,
+       tra.teacher_type,
+       tra.teacher_id,
+       tra.reason,
+       tra.status,
+       tra.requested_at,
+       tra.approved_at,
+       tra.rejection_note,
+       COALESCE(pt.tin,       it.tin)       AS teacher_tin,
+       COALESCE(pt.full_name, it.full_name) AS teacher_name,
+       u1.username AS requested_by_username,
+       u2.username AS approved_by_username
+     FROM teacher_removal_approvals tra
+     LEFT JOIN private_school_teachers pt
+       ON tra.teacher_type = 'Private' AND tra.teacher_id = pt.id
+     LEFT JOIN international_school_teachers it
+       ON tra.teacher_type = 'International' AND tra.teacher_id = it.id
+     LEFT JOIN users u1 ON tra.requested_by = u1.id
+     LEFT JOIN users u2 ON tra.approved_by  = u2.id
+     ${whereClause}
+     ORDER BY tra.requested_at DESC`,
     params,
   );
   return rows;
