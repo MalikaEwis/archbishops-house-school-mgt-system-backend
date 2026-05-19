@@ -54,25 +54,25 @@ A school-centric module for schools that have been vested to the Archdiocese. Ea
 
 ## System Capabilities
 
-| Capability | Detail |
-|---|---|
-| **Role-Based Access Control** | Five roles with granular route-level and data-level enforcement |
-| **TIN Allocation System** | Concurrency-safe Teacher Identification Number generation with slot reuse |
-| **Dual-Admin Removal Workflow** | Two separate admins must authorise any teacher removal; cross-admin, cross-session |
-| **XLSX / CSV Migration** | In-browser atomic reset-and-reimport from official spreadsheet exports |
-| **Placeholder TIN Preservation** | Blank legacy rows are stored as vacant slots; TIN sequence continuity is maintained |
-| **Profile Picture Management** | Upload and remove profile photos per teacher; stored on disk under a configurable path |
-| **Document Management** | PDF upload, replacement, and download per teacher; admin-only document flag supported |
-| **Advanced Filtering & Search** | Server-side filtering by school, category, status, name, TIN, NIC, and more |
-| **Pagination** | Cursor-free offset pagination on all list endpoints |
-| **Retirement Calculations** | Age and retirement date computed in the database from date of birth |
-| **Service Length Calculation** | Present service (years + months) computed from date of first appointment |
-| **Student Statistics** | Yearly per-school breakdown by religion and teaching medium |
-| **School Filter Middleware** | Principals and HR officers are automatically scoped to their own school |
-| **Audit Logging** | Structural audit log table for tracking sensitive operations |
-| **Rate Limiting** | Per-IP request throttling on all API routes |
-| **Request Logging** | HTTP request logging via Morgan + Winston |
-| **Soft Delete** | Teacher TINs are never deleted; only personal data is cleared on removal |
+| Capability                       | Detail                                                                                 |
+| -------------------------------- | -------------------------------------------------------------------------------------- |
+| **Role-Based Access Control**    | Five roles with granular route-level and data-level enforcement                        |
+| **TIN Allocation System**        | Concurrency-safe Teacher Identification Number generation with slot reuse              |
+| **Dual-Admin Removal Workflow**  | Two separate admins must authorise any teacher removal; cross-admin, cross-session     |
+| **XLSX / CSV Migration**         | In-browser atomic reset-and-reimport from official spreadsheet exports                 |
+| **Placeholder TIN Preservation** | Blank legacy rows are stored as vacant slots; TIN sequence continuity is maintained    |
+| **Profile Picture Management**   | Upload and remove profile photos per teacher; stored on disk under a configurable path |
+| **Document Management**          | PDF upload, replacement, and download per teacher; admin-only document flag supported  |
+| **Advanced Filtering & Search**  | Server-side filtering by school, category, status, name, TIN, NIC, and more            |
+| **Pagination**                   | Cursor-free offset pagination on all list endpoints                                    |
+| **Retirement Calculations**      | Age and retirement date computed in the database from date of birth                    |
+| **Service Length Calculation**   | Present service (years + months) computed from date of first appointment               |
+| **Student Statistics**           | Yearly per-school breakdown by religion and teaching medium                            |
+| **School Filter Middleware**     | Principals and HR officers are automatically scoped to their own school                |
+| **Audit Logging**                | Structural audit log table for tracking sensitive operations                           |
+| **Rate Limiting**                | Per-IP request throttling on all API routes                                            |
+| **Request Logging**              | HTTP request logging via Morgan + Winston                                              |
+| **Soft Delete**                  | Teacher TINs are never deleted; only personal data is cleared on removal               |
 
 ---
 
@@ -80,29 +80,29 @@ A school-centric module for schools that have been vested to the Archdiocese. Ea
 
 ### Backend
 
-| Layer | Technology |
-|---|---|
-| Runtime | Node.js |
-| Framework | Express 5 |
-| Database driver | mysql2 / promise |
-| Authentication | jsonwebtoken + bcryptjs |
-| File uploads | Multer (disk + memory storage) |
-| Spreadsheet parsing | xlsx |
-| Security headers | Helmet |
-| Rate limiting | express-rate-limit |
-| Logging | Winston + Morgan |
-| Process management | Nodemon (development) |
+| Layer               | Technology                     |
+| ------------------- | ------------------------------ |
+| Runtime             | Node.js                        |
+| Framework           | Express 5                      |
+| Database driver     | mysql2 / promise               |
+| Authentication      | jsonwebtoken + bcryptjs        |
+| File uploads        | Multer (disk + memory storage) |
+| Spreadsheet parsing | xlsx                           |
+| Security headers    | Helmet                         |
+| Rate limiting       | express-rate-limit             |
+| Logging             | Winston + Morgan               |
+| Process management  | Nodemon (development)          |
 
 ### Frontend
 
-| Layer | Technology |
-|---|---|
-| UI library | React 19 |
-| Routing | React Router DOM 7 |
-| HTTP client | Axios |
-| Dialogs & alerts | SweetAlert2 |
-| Styling | CSS Modules |
-| Build tool | Vite 8 |
+| Layer            | Technology         |
+| ---------------- | ------------------ |
+| UI library       | React 19           |
+| Routing          | React Router DOM 7 |
+| HTTP client      | Axios              |
+| Dialogs & alerts | SweetAlert2        |
+| Styling          | CSS Modules        |
+| Build tool       | Vite 8             |
 
 ### Database
 
@@ -120,7 +120,7 @@ The backend follows a **modular monolith** pattern. Each feature domain is a sel
 request → authenticate → authorize → schoolFilter → asyncHandler → controller → service → repository → MySQL
 ```
 
-- **`authenticate`** — validates Bearer JWT, attaches `req.user` (sub, username, role, school\_type, school\_id)
+- **`authenticate`** — validates Bearer JWT, attaches `req.user` (sub, username, role, school_type, school_id)
 - **`authorize(...roles)`** — rejects roles not in the allowed list
 - **`schoolFilter`** — sets `req.schoolFilter`: `null` for admin roles, `{ school_id }` for principals/HR; services always consume this, never raw query params
 - **`asyncHandler`** — wraps async controller functions so thrown errors propagate to the central error handler
@@ -274,12 +274,12 @@ Administrators can upload the official XLSX spreadsheet exports directly through
 
 After every import, the UI displays a structured summary:
 
-| Section | Contents |
-|---|---|
-| Inserted | Count of active teacher records created |
-| Placeholders | Sheet name, row number, TIN, school, generated placeholder NIC |
-| Skipped | Sheet name, row number, teacher name, school, exact skip reason |
-| Errors | Sheet name, row number, error message |
+| Section      | Contents                                                        |
+| ------------ | --------------------------------------------------------------- |
+| Inserted     | Count of active teacher records created                         |
+| Placeholders | Sheet name, row number, TIN, school, generated placeholder NIC  |
+| Skipped      | Sheet name, row number, teacher name, school, exact skip reason |
+| Errors       | Sheet name, row number, error message                           |
 
 This workflow is role-scoped: `admin_private` resets private + retired data; `admin_international` resets international data.
 
@@ -289,13 +289,13 @@ This workflow is role-scoped: `admin_private` resets private + retired data; `ad
 
 ### Roles
 
-| Role | Scope | Permissions |
-|---|---|---|
-| `admin_private` | All private schools | Full CRUD — teachers, rectors, fathers, documents, import/reset |
-| `admin_international` | All international schools | Full CRUD — teachers, documents, import/reset |
-| `admin_vested` | All vested schools | Full CRUD — schools, principals, student stats |
-| `principal` | Own school only | View-only — teachers at their assigned school |
-| `head_of_hr` | Own school only | View-only — teachers at their assigned school |
+| Role                  | Scope                     | Permissions                                                     |
+| --------------------- | ------------------------- | --------------------------------------------------------------- |
+| `admin_private`       | All private schools       | Full CRUD — teachers, rectors, fathers, documents, import/reset |
+| `admin_international` | All international schools | Full CRUD — teachers, documents, import/reset                   |
+| `admin_vested`        | All vested schools        | Full CRUD — schools, principals, student stats                  |
+| `principal`           | Own school only           | View-only — teachers at their assigned school                   |
+| `head_of_hr`          | Own school only           | View-only — teachers at their assigned school                   |
 
 ### Dual-Admin Teacher Removal
 
@@ -323,18 +323,18 @@ Admin A cannot approve their own request. The approval table (`teacher_removal_a
 
 All routes are prefixed with `/api`.
 
-| Prefix | Module |
-|---|---|
-| `/api/auth` | Login, session |
-| `/api/teachers` | Private school teachers + removal workflow |
-| `/api/international-teachers` | International school teachers + removal workflow |
-| `/api/schools` | School master list |
-| `/api/vested` | Vested schools, principals, student stats |
-| `/api/rectors` | Archdiocesan rectors |
-| `/api/fathers` | College fathers |
-| `/api/documents` | PDF document upload, download, management |
-| `/api/tin` | TIN allocation utilities |
-| `/api/admin` | Atomic reset-and-reimport (private + international) |
+| Prefix                        | Module                                              |
+| ----------------------------- | --------------------------------------------------- |
+| `/api/auth`                   | Login, session                                      |
+| `/api/teachers`               | Private school teachers + removal workflow          |
+| `/api/international-teachers` | International school teachers + removal workflow    |
+| `/api/schools`                | School master list                                  |
+| `/api/vested`                 | Vested schools, principals, student stats           |
+| `/api/rectors`                | Archdiocesan rectors                                |
+| `/api/fathers`                | College fathers                                     |
+| `/api/documents`              | PDF document upload, download, management           |
+| `/api/tin`                    | TIN allocation utilities                            |
+| `/api/admin`                  | Atomic reset-and-reimport (private + international) |
 
 ---
 
@@ -356,22 +356,22 @@ All routes are prefixed with `/api`.
 
 > _Screenshots to be added after final UI polish._
 
-| View | Description |
-|---|---|
-| Login | Secure login page with role-based redirect |
-| Teacher List | Filterable, paginated teacher list with TIN and status |
-| Teacher Detail | Full teacher profile with documents, qualifications, and removal controls |
-| Import / Reset | XLSX upload with structured post-import summary report |
-| Vested School Detail | Extended school profile with principal history and student stats |
-| Removal Requests | Pending / Approved / Rejected removal request queue |
+| View                 | Description                                                               |
+| -------------------- | ------------------------------------------------------------------------- |
+| Login                | Secure login page with role-based redirect                                |
+| Teacher List         | Filterable, paginated teacher list with TIN and status                    |
+| Teacher Detail       | Full teacher profile with documents, qualifications, and removal controls |
+| Import / Reset       | XLSX upload with structured post-import summary report                    |
+| Vested School Detail | Extended school profile with principal history and student stats          |
+| Removal Requests     | Pending / Approved / Rejected removal request queue                       |
 
 ---
 
-## Developed By
+## Developed By E-WIS Solutions
 
 **Backend & Frontend Developer**
 Malika Degaldoruwa
 
 ---
 
-*Archbishop's House School Management System — Archdiocese of Colombo*
+_Archbishop's House School Management System — Archdiocese of Colombo_
