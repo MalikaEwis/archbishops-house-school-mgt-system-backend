@@ -133,7 +133,7 @@ function buildWhere(filters) {
     filters.isActive === '0'   ||
     filters.isActive === 0
   ) {
-    clauses.push('t.is_active = 0');
+    clauses.push('t.is_active = 0 AND t.removed_at IS NOT NULL');
   } else {
     clauses.push('t.is_active = 1');
   }

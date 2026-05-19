@@ -16,9 +16,11 @@ const NAV_BY_ROLE = {
     { label: 'Fathers',          to: '/private/fathers' },
     { label: 'Rectors',          to: '/private/rectors' },
     { label: 'Removal Requests', to: '/private/removal-requests' },
+    { label: 'Import / Reset',   to: '/admin/import' },
   ],
   admin_international: [
-    { label: 'Teachers', to: '/international/teachers' },
+    { label: 'Teachers',       to: '/international/teachers' },
+    { label: 'Import / Reset', to: '/admin/import' },
   ],
   admin_vested: [
     { label: 'Schools',  to: '/vested/schools' },

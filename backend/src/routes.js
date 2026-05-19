@@ -11,6 +11,7 @@ const vestedRoutes    = require('./modules/vested/vested.routes');
 const rectorsRoutes        = require('./modules/rectors/rectors.routes');
 const fathersRoutes        = require('./modules/fathers/fathers.routes');
 const internationalRoutes  = require('./modules/international/international.routes');
+const adminRoutes          = require('./modules/admin/admin.routes');
 
 const router = Router();
 
@@ -23,5 +24,6 @@ router.use('/vested',                 vestedRoutes);
 router.use('/rectors',                rectorsRoutes);
 router.use('/fathers',                fathersRoutes);
 router.use('/international-teachers', internationalRoutes);
+router.use('/admin',                  adminRoutes);
 
 module.exports = router;

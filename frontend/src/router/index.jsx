@@ -21,6 +21,7 @@ import RemovalRequestsPage from "../pages/private/RemovalRequestsPage";
 import VestedSchoolListPage   from "../pages/vested/VestedSchoolListPage";
 import VestedSchoolDetailPage from "../pages/vested/VestedSchoolDetailPage";
 import VestedSchoolFormPage   from "../pages/vested/VestedSchoolFormPage";
+import AdminImportPage        from "../pages/private/AdminImportPage";
 
 const router = createBrowserRouter([
   // ── Public ────────────────────────────────────────────────────────────────
@@ -68,6 +69,14 @@ const router = createBrowserRouter([
               { path: "international/teachers/new",      element: <InternationalTeacherFormPage /> },
               { path: "international/teachers/:id",      element: <InternationalTeacherDetailPage /> },
               { path: "international/teachers/:id/edit", element: <InternationalTeacherFormPage /> },
+            ],
+          },
+
+          // Import / Reset — private and international admins share this route
+          {
+            element: <RoleGuard roles={["admin_private", "admin_international"]} />,
+            children: [
+              { path: "admin/import", element: <AdminImportPage /> },
             ],
           },
 
