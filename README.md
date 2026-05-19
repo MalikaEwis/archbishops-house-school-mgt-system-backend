@@ -210,11 +210,11 @@ Create `backend/.env` with the following:
 
 ```env
 NODE_ENV=development
-PORT=5000
+PORT=
 
 DB_HOST=localhost
-DB_PORT=3306
-DB_USER=root
+DB_PORT=
+DB_USER=
 DB_PASSWORD=
 DB_NAME=archbishops_school_mgt
 
