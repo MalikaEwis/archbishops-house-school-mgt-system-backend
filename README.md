@@ -26,7 +26,7 @@ A production-grade school management system commissioned by **Archbishop's House
 11. [API Overview](#api-overview)
 12. [Future Enhancements](#future-enhancements)
 13. [Screenshots](#screenshots)
-14. [Developed By](#developed-by)
+14. [Developed By](#developed-by-E-WIS-Solutions)
 
 ---
 
