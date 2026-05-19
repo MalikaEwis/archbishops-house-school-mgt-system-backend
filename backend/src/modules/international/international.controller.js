@@ -52,4 +52,21 @@ async function removeProfilePicture(req, res) {
   return sendSuccess(res, teacher, 'Profile picture removed');
 }
 
-module.exports = { getAll, getOne, create, update, uploadProfilePicture, removeProfilePicture };
+async function requestRemoval(req, res) {
+  const result = await service.requestRemoval(
+    req.params.id,
+    req.body.reason,
+    req.user.sub,
+  );
+  return sendCreated(res, result, result.message);
+}
+
+module.exports = {
+  getAll,
+  getOne,
+  create,
+  update,
+  uploadProfilePicture,
+  removeProfilePicture,
+  requestRemoval,
+};

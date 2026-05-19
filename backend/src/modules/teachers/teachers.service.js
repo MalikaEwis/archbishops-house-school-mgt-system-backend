@@ -10,6 +10,7 @@
 
 const { getPool }  = require('../../config/database');
 const repo         = require('./teachers.repository');
+const intlRepo     = require('../international/international.repository');
 const tinService   = require('../tin/tin.service');
 const AppError     = require('../../shared/utils/AppError');
 
@@ -510,8 +511,10 @@ async function approveRemoval(requestId, adminId) {
     await conn.beginTransaction();
 
     await repo.approveRemovalRequest(requestId, adminId);
-    await repo.softDeleteTeacher(request.teacher_id, request.reason, conn);
-    await repo.clearSatelliteData(request.teacher_id, conn);
+
+    const targetRepo = request.teacher_type === 'International' ? intlRepo : repo;
+    await targetRepo.softDeleteTeacher(request.teacher_id, request.reason, conn);
+    await targetRepo.clearSatelliteData(request.teacher_id, conn);
 
     await conn.commit();
     return { message: 'Teacher removed successfully. TIN preserved.' };

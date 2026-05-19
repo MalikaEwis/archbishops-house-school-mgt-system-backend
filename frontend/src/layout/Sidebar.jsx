@@ -19,8 +19,9 @@ const NAV_BY_ROLE = {
     { label: 'Import / Reset',   to: '/admin/import' },
   ],
   admin_international: [
-    { label: 'Teachers',       to: '/international/teachers' },
-    { label: 'Import / Reset', to: '/admin/import' },
+    { label: 'Teachers',         to: '/international/teachers' },
+    { label: 'Removal Requests', to: '/international/removal-requests' },
+    { label: 'Import / Reset',   to: '/admin/import' },
   ],
   admin_vested: [
     { label: 'Schools',  to: '/vested/schools' },

@@ -36,3 +36,8 @@ export async function removeInternationalTeacherProfilePicture(id) {
   const { data } = await client.delete(`/international-teachers/${id}/profile-picture`);
   return data.data;
 }
+
+export async function requestInternationalTeacherRemoval(id, reason) {
+  const { data } = await client.post(`/international-teachers/${id}/removal-request`, { reason });
+  return data.data;
+}

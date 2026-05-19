@@ -21,7 +21,8 @@ import RemovalRequestsPage from "../pages/private/RemovalRequestsPage";
 import VestedSchoolListPage   from "../pages/vested/VestedSchoolListPage";
 import VestedSchoolDetailPage from "../pages/vested/VestedSchoolDetailPage";
 import VestedSchoolFormPage   from "../pages/vested/VestedSchoolFormPage";
-import AdminImportPage        from "../pages/private/AdminImportPage";
+import AdminImportPage                  from "../pages/private/AdminImportPage";
+import InternationalRemovalRequestsPage from "../pages/international/InternationalRemovalRequestsPage";
 
 const router = createBrowserRouter([
   // ── Public ────────────────────────────────────────────────────────────────
@@ -65,10 +66,11 @@ const router = createBrowserRouter([
           {
             element: <RoleGuard roles={["admin_international"]} />,
             children: [
-              { path: "international/teachers",          element: <InternationalTeacherListPage /> },
-              { path: "international/teachers/new",      element: <InternationalTeacherFormPage /> },
-              { path: "international/teachers/:id",      element: <InternationalTeacherDetailPage /> },
-              { path: "international/teachers/:id/edit", element: <InternationalTeacherFormPage /> },
+              { path: "international/teachers",            element: <InternationalTeacherListPage /> },
+              { path: "international/teachers/new",        element: <InternationalTeacherFormPage /> },
+              { path: "international/teachers/:id",        element: <InternationalTeacherDetailPage /> },
+              { path: "international/teachers/:id/edit",   element: <InternationalTeacherFormPage /> },
+              { path: "international/removal-requests",    element: <InternationalRemovalRequestsPage /> },
             ],
           },
 

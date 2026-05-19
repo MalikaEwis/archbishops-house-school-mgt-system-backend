@@ -445,6 +445,72 @@ async function updateProfilePicture(id, filePath) {
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Soft-delete (FR-19): clear personal data, preserve TIN
+// ─────────────────────────────────────────────────────────────────────────────
+
+async function softDeleteTeacher(id, reason, conn) {
+  const db = conn || getPool();
+  await db.execute(
+    `UPDATE international_school_teachers SET
+       category                  = NULL,
+       full_name                 = NULL,
+       designation               = NULL,
+       nic                       = NULL,
+       date_of_birth             = NULL,
+       religion                  = NULL,
+       address                   = NULL,
+       email                     = NULL,
+       date_of_first_appointment = NULL,
+       profile_picture_path      = NULL,
+       is_active                 = 0,
+       removed_at                = NOW(),
+       removed_reason            = ?
+     WHERE id = ?`,
+    [reason, id],
+  );
+}
+
+// softDeleteTeacher does UPDATE not DELETE, so ON DELETE CASCADE never fires.
+async function clearSatelliteData(teacherId, conn) {
+  const db = conn || getPool();
+  await Promise.all([
+    db.execute('DELETE FROM international_teacher_phones                      WHERE teacher_id = ?', [teacherId]),
+    db.execute('DELETE FROM international_teacher_contracts                   WHERE teacher_id = ?', [teacherId]),
+    db.execute('DELETE FROM international_teacher_mediums                     WHERE teacher_id = ?', [teacherId]),
+    db.execute('DELETE FROM international_teacher_class_levels                WHERE teacher_id = ?', [teacherId]),
+    db.execute('DELETE FROM international_teacher_education                   WHERE teacher_id = ?', [teacherId]),
+    db.execute('DELETE FROM international_teacher_professional_qualifications WHERE teacher_id = ?', [teacherId]),
+    db.execute('DELETE FROM international_teacher_subjects                    WHERE teacher_id = ?', [teacherId]),
+  ]);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Dual-admin removal workflow (FR-20) — shared table, international side
+// ─────────────────────────────────────────────────────────────────────────────
+
+async function createRemovalRequest(teacherId, teacherType, reason, requestedBy) {
+  const pool = getPool();
+  const [result] = await pool.execute(
+    `INSERT INTO teacher_removal_approvals
+       (teacher_type, teacher_id, reason, requested_by, status)
+     VALUES (?, ?, ?, ?, 'Pending')`,
+    [teacherType, teacherId, reason, requestedBy],
+  );
+  return result.insertId;
+}
+
+async function findPendingRemovalRequest(teacherId, teacherType) {
+  const pool = getPool();
+  const [rows] = await pool.execute(
+    `SELECT * FROM teacher_removal_approvals
+     WHERE teacher_id = ? AND teacher_type = ? AND status = 'Pending'
+     LIMIT 1`,
+    [teacherId, teacherType],
+  );
+  return rows[0];
+}
+
 module.exports = {
   // Read
   findAll,
@@ -462,6 +528,7 @@ module.exports = {
   reactivateVacantRow,
   updateTeacher,
   updateProfilePicture,
+  softDeleteTeacher,
   // Write (satellite)
   setPhones,
   upsertContract,
@@ -470,4 +537,8 @@ module.exports = {
   setEducation,
   setProfessionalQualifications,
   setSubjects,
+  clearSatelliteData,
+  // Removal workflow
+  createRemovalRequest,
+  findPendingRemovalRequest,
 };

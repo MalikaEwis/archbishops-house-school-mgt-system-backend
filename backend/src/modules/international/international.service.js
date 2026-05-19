@@ -245,4 +245,44 @@ async function removeProfilePicture(id) {
   return findById(Number(id), null);
 }
 
-module.exports = { findAll, findById, create, update, updateProfilePicture, removeProfilePicture };
+// ─────────────────────────────────────────────────────────────────────────────
+// Removal workflow (FR-20) — admin A initiates
+// ─────────────────────────────────────────────────────────────────────────────
+
+async function requestRemoval(teacherId, reason, adminId) {
+  const teacher = await repo.findById(Number(teacherId));
+  if (!teacher)           throw new AppError('Teacher not found.', 404);
+  if (!teacher.is_active) throw new AppError('Teacher is already removed.', 409);
+
+  const existing = await repo.findPendingRemovalRequest(Number(teacherId), 'International');
+  if (existing) {
+    throw new AppError(
+      'A removal request for this teacher is already pending. A second admin must approve it.',
+      409,
+    );
+  }
+
+  const VALID_REASONS = ['Resignation', 'Retirement', 'Transfer', 'Qualification_Failure'];
+  if (!VALID_REASONS.includes(reason)) {
+    throw new AppError(`Invalid reason "${reason}".`, 400);
+  }
+
+  const insertId = await repo.createRemovalRequest(
+    Number(teacherId),
+    'International',
+    reason,
+    adminId,
+  );
+
+  return { id: insertId, message: 'Removal request submitted. A second admin must approve.' };
+}
+
+module.exports = {
+  findAll,
+  findById,
+  create,
+  update,
+  updateProfilePicture,
+  removeProfilePicture,
+  requestRemoval,
+};

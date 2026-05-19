@@ -1,40 +1,68 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 import {
   fetchInternationalTeacher,
   uploadInternationalTeacherProfilePicture,
   removeInternationalTeacherProfilePicture,
+  requestInternationalTeacherRemoval,
 } from '../../api/internationalTeachers';
+import { fetchRemovalRequests } from '../../api/teachers';
 import { useAuth } from '../../auth/AuthContext';
 import ProfilePicture from '../../components/ProfilePicture';
 import styles from '../private/TeacherDetailPage.module.css';
+
+const REASON_LABELS = {
+  Resignation:           'Resignation',
+  Retirement:            'Retirement',
+  Transfer:              'Transfer',
+  Qualification_Failure: 'Qualification Failure',
+};
+
+function getBasePath(role) {
+  return (role === 'principal' || role === 'head_of_hr')
+    ? '/my-school/international/teachers'
+    : '/international/teachers';
+}
 
 export default function InternationalTeacherDetailPage() {
   const { id }   = useParams();
   const navigate = useNavigate();
 
-  const { user } = useAuth();
-  const isAdmin = user?.role === 'admin_international';
+  const { user }  = useAuth();
+  const isAdmin   = user?.role === 'admin_international';
+  const readOnly  = user?.role === 'principal' || user?.role === 'head_of_hr';
+  const basePath  = getBasePath(user?.role);
 
-  const [teacher, setTeacher] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error,   setError]   = useState('');
+  const [teacher,        setTeacher]        = useState(null);
+  const [loading,        setLoading]        = useState(true);
+  const [error,          setError]          = useState('');
+  const [pendingRequest, setPendingRequest] = useState(null);
 
   useEffect(() => {
     setLoading(true);
     setError('');
-    fetchInternationalTeacher(id)
-      .then(setTeacher)
+
+    const teacherFetch = fetchInternationalTeacher(id);
+    const pendingFetch = isAdmin
+      ? fetchRemovalRequests({ teacherId: id, teacherType: 'International', status: 'Pending' })
+      : Promise.resolve([]);
+
+    Promise.all([teacherFetch, pendingFetch])
+      .then(([teacherData, pendingData]) => {
+        setTeacher(teacherData);
+        setPendingRequest(pendingData[0] ?? null);
+      })
       .catch((err) =>
         setError(err.response?.data?.message ?? 'Failed to load teacher.'),
       )
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, isAdmin]);
 
   if (loading) {
     return (
       <div className={styles.page}>
-        <button className={styles.backBtn} onClick={() => navigate('/international/teachers')}>
+        <button className={styles.backBtn} onClick={() => navigate(basePath)}>
           ← Back to list
         </button>
         <p className={styles.stateMsg}>Loading…</p>
@@ -45,7 +73,7 @@ export default function InternationalTeacherDetailPage() {
   if (error) {
     return (
       <div className={styles.page}>
-        <button className={styles.backBtn} onClick={() => navigate('/international/teachers')}>
+        <button className={styles.backBtn} onClick={() => navigate(basePath)}>
           ← Back to list
         </button>
         <p className={styles.error}>{error}</p>
@@ -53,36 +81,108 @@ export default function InternationalTeacherDetailPage() {
     );
   }
 
+  const isRemoved = !teacher.is_active;
+
+  async function handleRequestRemoval() {
+    const { value: reason } = await Swal.fire({
+      title: 'Request Teacher Removal',
+      html: `
+        <select id="swal-reason" class="swal2-select" style="width:100%;margin-top:0.5rem">
+          <option value="" disabled selected>Select reason…</option>
+          <option value="Resignation">Resignation</option>
+          <option value="Retirement">Retirement</option>
+          <option value="Transfer">Transfer</option>
+          <option value="Qualification_Failure">Qualification Failure</option>
+        </select>
+      `,
+      focusConfirm: false,
+      preConfirm: () => {
+        const val = document.getElementById('swal-reason').value;
+        if (!val) { Swal.showValidationMessage('Please select a reason.'); return false; }
+        return val;
+      },
+      confirmButtonText: 'Submit Request',
+      confirmButtonColor: '#b91c1c',
+      showCancelButton: true,
+      cancelButtonColor: '#6b7280',
+      cancelButtonText: 'Cancel',
+    });
+
+    if (!reason) return;
+
+    try {
+      const result = await requestInternationalTeacherRemoval(teacher.id, reason);
+      setPendingRequest({ ...result, reason, requested_by_username: user?.username });
+      await Swal.fire({
+        title: 'Request submitted',
+        text: 'The removal request is now pending approval by a second admin.',
+        icon: 'success',
+        confirmButtonColor: '#4f46e5',
+      });
+    } catch (err) {
+      await Swal.fire({
+        title: 'Error',
+        text: err.response?.data?.message ?? 'Failed to submit removal request.',
+        icon: 'error',
+        confirmButtonColor: '#4f46e5',
+      });
+    }
+  }
+
   return (
     <div className={styles.page}>
       {/* ── Toolbar ───────────────────────────────────────────────────────── */}
       <div className={styles.toolbar}>
-        <button className={styles.backBtn} onClick={() => navigate('/international/teachers')}>
+        <button className={styles.backBtn} onClick={() => navigate(basePath)}>
           ← Back to list
         </button>
         {isAdmin && (
-          <button
-            className={styles.editBtn}
-            onClick={() => navigate(`/international/teachers/${teacher.id}/edit`)}
-          >
-            Edit
-          </button>
+          <div className={styles.actions}>
+            <button
+              className={styles.editBtn}
+              disabled={isRemoved}
+              onClick={() => navigate(`/international/teachers/${teacher.id}/edit`)}
+            >
+              Edit
+            </button>
+            <button
+              className={styles.removalBtn}
+              disabled={isRemoved || !!pendingRequest}
+              onClick={handleRequestRemoval}
+            >
+              {pendingRequest ? 'Removal Pending' : 'Request Removal'}
+            </button>
+          </div>
         )}
       </div>
 
       {/* ── Title ─────────────────────────────────────────────────────────── */}
       <div className={styles.titleRow}>
         <h1 className={styles.heading}>{teacher.full_name}</h1>
-        <span className={teacher.is_active ? styles.badgeActive : styles.badgeRemoved}>
-          {teacher.is_active ? 'Active' : 'Removed'}
+        <span className={isRemoved ? styles.badgeRemoved : styles.badgeActive}>
+          {isRemoved ? 'Removed' : 'Active'}
         </span>
       </div>
+
+      {isRemoved && teacher.removed_reason && (
+        <p className={styles.removedNote}>
+          Removed · reason: <strong>{REASON_LABELS[teacher.removed_reason] ?? teacher.removed_reason}</strong>
+        </p>
+      )}
+
+      {pendingRequest && !isRemoved && (
+        <p className={styles.removedNote} style={{ background: '#fffbeb', borderColor: '#fde68a', color: '#92400e' }}>
+          Removal pending · Requested by <strong>{pendingRequest.requested_by_username ?? 'an admin'}</strong> ·
+          Reason: <strong>{REASON_LABELS[pendingRequest.reason] ?? pendingRequest.reason}</strong> ·
+          Awaiting a second admin to approve.
+        </p>
+      )}
 
       {/* ── Profile Picture ───────────────────────────────────────────────── */}
       <ProfilePicture
         picturePath={teacher.profile_picture_path}
         name={teacher.full_name}
-        isAdmin={isAdmin && teacher.is_active}
+        isAdmin={isAdmin && !isRemoved}
         onUpload={async (file) => {
           const updated = await uploadInternationalTeacherProfilePicture(teacher.id, file);
           setTeacher(updated);

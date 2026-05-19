@@ -27,6 +27,13 @@ router.post(
   asyncHandler(ctrl.create),
 );
 
+// POST /api/international-teachers/:id/removal-request  (admin A initiates FR-20)
+router.post(
+  '/:id/removal-request',
+  authorize(...ROLE_GROUPS.INTERNATIONAL_ADMINS),
+  asyncHandler(ctrl.requestRemoval),
+);
+
 // GET  /api/international-teachers/:id
 router.get(
   '/:id',
