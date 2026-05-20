@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { fetchInternationalTeachers } from '../../api/internationalTeachers';
 import { useAuth } from '../../auth/AuthContext';
 import Pagination from '../../components/Pagination';
+import StatusBadge from '../../components/StatusBadge';
 import styles from '../private/TeacherListPage.module.css';
 
 const CATEGORY_OPTIONS = [
@@ -181,10 +182,7 @@ export default function InternationalTeacherListPage() {
                 <td className={styles.mono}>{t.nic ?? '—'}</td>
                 <td>{t.school_name ?? '—'}</td>
                 <td>
-                  {t.is_active
-                    ? <span className={styles.badgeActive}>Active</span>
-                    : <span className={styles.badgeRemoved}>Removed</span>
-                  }
+                  <StatusBadge status={t.is_active ? 'Active' : 'Removed'} />
                 </td>
                 <td>
                   <button

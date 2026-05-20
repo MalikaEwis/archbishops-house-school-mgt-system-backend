@@ -10,6 +10,7 @@ import {
 import { fetchRemovalRequests } from '../../api/teachers';
 import { useAuth } from '../../auth/AuthContext';
 import ProfilePicture from '../../components/ProfilePicture';
+import StatusBadge from '../../components/StatusBadge';
 import styles from '../private/TeacherDetailPage.module.css';
 
 const REASON_LABELS = {
@@ -102,7 +103,7 @@ export default function InternationalTeacherDetailPage() {
         return val;
       },
       confirmButtonText: 'Submit Request',
-      confirmButtonColor: '#b91c1c',
+      confirmButtonColor: '#923328',
       showCancelButton: true,
       cancelButtonColor: '#6b7280',
       cancelButtonText: 'Cancel',
@@ -117,14 +118,14 @@ export default function InternationalTeacherDetailPage() {
         title: 'Request submitted',
         text: 'The removal request is now pending approval by a second admin.',
         icon: 'success',
-        confirmButtonColor: '#4f46e5',
+        confirmButtonColor: '#3B6355',
       });
     } catch (err) {
       await Swal.fire({
         title: 'Error',
         text: err.response?.data?.message ?? 'Failed to submit removal request.',
         icon: 'error',
-        confirmButtonColor: '#4f46e5',
+        confirmButtonColor: '#3B6355',
       });
     }
   }
@@ -159,9 +160,7 @@ export default function InternationalTeacherDetailPage() {
       {/* ── Title ─────────────────────────────────────────────────────────── */}
       <div className={styles.titleRow}>
         <h1 className={styles.heading}>{teacher.full_name}</h1>
-        <span className={isRemoved ? styles.badgeRemoved : styles.badgeActive}>
-          {isRemoved ? 'Removed' : 'Active'}
-        </span>
+        <StatusBadge status={isRemoved ? 'Removed' : 'Active'} />
       </div>
 
       {isRemoved && teacher.removed_reason && (
@@ -171,7 +170,7 @@ export default function InternationalTeacherDetailPage() {
       )}
 
       {pendingRequest && !isRemoved && (
-        <p className={styles.removedNote} style={{ background: '#fffbeb', borderColor: '#fde68a', color: '#92400e' }}>
+        <p className={styles.pendingNote}>
           Removal pending · Requested by <strong>{pendingRequest.requested_by_username ?? 'an admin'}</strong> ·
           Reason: <strong>{REASON_LABELS[pendingRequest.reason] ?? pendingRequest.reason}</strong> ·
           Awaiting a second admin to approve.
@@ -327,22 +326,11 @@ function fmtCategory(val) {
 
 function ChipList({ items }) {
   return (
-    <ul style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', listStyle: 'none', padding: 0, margin: 0 }}>
+    <div className={styles.chips}>
       {items.map((item, i) => (
-        <li
-          key={i}
-          style={{
-            background: 'var(--color-surface, #f1f5f9)',
-            border: '1px solid var(--color-border, #cbd5e1)',
-            borderRadius: '999px',
-            padding: '0.2rem 0.75rem',
-            fontSize: '0.85rem',
-          }}
-        >
-          {item}
-        </li>
+        <span key={i} className={styles.chip}>{item}</span>
       ))}
-    </ul>
+    </div>
   );
 }
 
