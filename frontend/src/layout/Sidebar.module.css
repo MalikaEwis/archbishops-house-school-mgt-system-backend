@@ -1,80 +1,86 @@
+/* ── Shell ───────────────────────────────────────────────────────────────── */
 .sidebar {
-  background: #1e1b4b;
-  color: #c7d2fe;
+  background: var(--ahs-bg-card);
+  border-right: 1px solid var(--ahs-border);
+  color: var(--ahs-text-secondary);
   display: flex;
   flex-direction: column;
-  width: 220px;
   flex-shrink: 0;
-  padding: 0;
+  width: 220px;
 }
 
+/* ── Brand / logo area ───────────────────────────────────────────────────── */
 .brand {
-  align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--ahs-border-subtle);
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 1.25rem 1rem;
+  gap: 3px;
+  padding: 1.25rem 1.25rem 1.1rem;
 }
 
 .brandShort {
-  color: #a5b4fc;
-  font-size: 1.4rem;
+  color: var(--ahs-accent);
+  font-size: 1.1rem;
   font-weight: 800;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
 }
 
 .brandFull {
-  color: #e0e7ff;
-  font-size: 0.72rem;
+  color: var(--ahs-text-muted);
+  font-size: 0.68rem;
   font-weight: 500;
-  text-align: center;
+  letter-spacing: 0.02em;
 }
 
+/* ── Module section label ────────────────────────────────────────────────── */
 .section {
-  color: #6366f1;
-  font-size: 0.68rem;
+  color: var(--ahs-text-muted);
+  font-size: 0.65rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  padding: 1.25rem 1rem 0.5rem;
+  letter-spacing: 0.1em;
+  padding: 1.25rem 1.25rem 0.4rem;
   text-transform: uppercase;
 }
 
+/* ── School name chip (principal / head_of_hr only) ─────────────────────── */
 .schoolName {
-  background: rgba(99, 102, 241, 0.15);
-  border-left: 3px solid #6366f1;
-  color: #e0e7ff;
-  font-size: 0.8rem;
+  background: var(--ahs-accent-subtle);
+  border-left: 3px solid var(--ahs-accent);
+  border-radius: 0 var(--ahs-radius-sm) var(--ahs-radius-sm) 0;
+  color: var(--ahs-accent);
+  font-size: 0.78rem;
   font-weight: 600;
   line-height: 1.35;
-  margin: 0 0.5rem 0.75rem;
-  padding: 0.5rem 0.75rem;
-  border-radius: 0 6px 6px 0;
+  margin: 0 0.75rem 0.75rem 0;
+  padding: 0.45rem 0.75rem;
 }
 
+/* ── Navigation links ────────────────────────────────────────────────────── */
 .nav {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 0 0.5rem;
+  padding: 0.25rem 0.5rem 1rem;
 }
 
 .link {
-  border-radius: 6px;
-  color: #c7d2fe;
+  border-radius: var(--ahs-radius-sm);
+  color: var(--ahs-text-secondary);
+  display: block;
   font-size: 0.875rem;
   font-weight: 500;
   padding: 0.5rem 0.75rem;
   text-decoration: none;
-  transition: background 0.15s, color 0.15s;
+  transition: background var(--ahs-transition), color var(--ahs-transition);
 }
 
 .link:hover {
-  background: rgba(255, 255, 255, 0.07);
-  color: #ffffff;
+  background: var(--ahs-accent-subtle);
+  color: var(--ahs-accent);
 }
 
 .active {
-  background: #4338ca;
-  color: #ffffff;
+  background: var(--ahs-accent-subtle);
+  color: var(--ahs-accent);
+  font-weight: 600;
 }

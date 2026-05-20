@@ -1,0 +1,212 @@
+/*
+ * buttons.module.css
+ * ───────────────────
+ * Semantic button variants for the whole application.
+ *
+ * Usage (combine a variant + optional size modifier):
+ *   import btn from '../../styles/buttons.module.css';
+ *
+ *   <button className={btn.primary}>Save</button>
+ *   <button className={`${btn.secondary} ${btn.sm}`}>Cancel</button>
+ *   <button className={`${btn.danger} ${btn.full}`}>Delete</button>
+ *
+ * Variants:  primary · secondary · danger · ghost
+ * Sizes:     sm · md (default) · lg · full (width: 100%)
+ *
+ * Every value references a var(--ahs-*) token from index.css.
+ */
+
+
+/* ── Base — applied to every button via the variant classes below ─────────── */
+/* (Not used directly — every variant class includes these rules.) */
+
+
+/* ═══════════════════════════════════════════════════════════════
+   VARIANTS
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Primary — main CTA: Save, Sign in, Submit, Create */
+.primary {
+  background: var(--ahs-accent);
+  border: 1px solid var(--ahs-accent);
+  border-radius: var(--ahs-radius-sm);
+  color: var(--ahs-text-on-accent);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  padding: 0.45rem 1rem;
+  transition: background var(--ahs-transition), border-color var(--ahs-transition);
+  white-space: nowrap;
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--ahs-accent-hover);
+  border-color: var(--ahs-accent-hover);
+}
+
+.primary:focus-visible {
+  outline: 2px solid var(--ahs-border-focus);
+  outline-offset: 2px;
+}
+
+.primary:disabled {
+  background: var(--ahs-accent-disabled);
+  border-color: var(--ahs-accent-disabled);
+  cursor: not-allowed;
+}
+
+
+/* Secondary — supporting actions: Edit, Back (button form), Cancel */
+.secondary {
+  background: var(--ahs-bg-card);
+  border: 1px solid var(--ahs-border);
+  border-radius: var(--ahs-radius-sm);
+  color: var(--ahs-text-primary);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  padding: 0.45rem 1rem;
+  transition: background var(--ahs-transition), border-color var(--ahs-transition);
+  white-space: nowrap;
+}
+
+.secondary:hover:not(:disabled) {
+  background: var(--ahs-bg-surface);
+  border-color: var(--ahs-text-muted);
+}
+
+.secondary:focus-visible {
+  outline: 2px solid var(--ahs-border-focus);
+  outline-offset: 2px;
+}
+
+.secondary:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+
+/* Danger — destructive actions: Request Removal, Approve Removal, Reset */
+.danger {
+  background: var(--ahs-danger);
+  border: 1px solid var(--ahs-danger);
+  border-radius: var(--ahs-radius-sm);
+  color: var(--ahs-text-on-accent);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  padding: 0.45rem 1rem;
+  transition: background var(--ahs-transition), border-color var(--ahs-transition);
+  white-space: nowrap;
+}
+
+.danger:hover:not(:disabled) {
+  background: var(--ahs-danger-hover);
+  border-color: var(--ahs-danger-hover);
+}
+
+.danger:focus-visible {
+  outline: 2px solid var(--ahs-danger);
+  outline-offset: 2px;
+}
+
+.danger:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+
+/* Danger outline — pending/removal states (border only, no fill) */
+.dangerOutline {
+  background: var(--ahs-bg-card);
+  border: 1px solid var(--ahs-danger-border);
+  border-radius: var(--ahs-radius-sm);
+  color: var(--ahs-danger);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  padding: 0.45rem 1rem;
+  transition: background var(--ahs-transition), border-color var(--ahs-transition);
+  white-space: nowrap;
+}
+
+.dangerOutline:hover:not(:disabled) {
+  background: var(--ahs-danger-bg);
+  border-color: var(--ahs-danger);
+}
+
+.dangerOutline:focus-visible {
+  outline: 2px solid var(--ahs-danger);
+  outline-offset: 2px;
+}
+
+.dangerOutline:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+
+/* Ghost — low-priority actions: View, inline row actions */
+.ghost {
+  background: transparent;
+  border: 1px solid var(--ahs-border);
+  border-radius: var(--ahs-radius-sm);
+  color: var(--ahs-text-secondary);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  padding: 0.45rem 1rem;
+  transition: background var(--ahs-transition), border-color var(--ahs-transition), color var(--ahs-transition);
+  white-space: nowrap;
+}
+
+.ghost:hover:not(:disabled) {
+  background: var(--ahs-bg-surface);
+  border-color: var(--ahs-text-muted);
+  color: var(--ahs-text-primary);
+}
+
+.ghost:focus-visible {
+  outline: 2px solid var(--ahs-border-focus);
+  outline-offset: 2px;
+}
+
+.ghost:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   SIZE MODIFIERS
+   Combine with any variant: className={`${btn.primary} ${btn.sm}`}
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Small — table row actions, inline controls */
+.sm {
+  font-size: 0.8rem;
+  padding: 0.25rem 0.65rem;
+}
+
+/* Medium — default (no modifier needed, but explicit class available) */
+.md {
+  font-size: 0.875rem;
+  padding: 0.45rem 1rem;
+}
+
+/* Large — prominent form submits */
+.lg {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  padding: 0.65rem 1.5rem;
+}
+
+/* Full width — login form, single-action cards */
+.full {
+  width: 100%;
+}

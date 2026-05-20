@@ -1,0 +1,528 @@
+/*
+ * shared.module.css
+ * ─────────────────
+ * Reusable layout and UI patterns for all three modules
+ * (Private, International, Vested).
+ *
+ * Import alongside a page-specific module:
+ *   import s  from '../../styles/shared.module.css';
+ *   import ls from './TeacherListPage.module.css';
+ *
+ * Usage in JSX:
+ *   <div className={s.detailPage}>
+ *   <table className={s.table}>
+ *   <span className={`${s.badge} ${s.badgePending}`}>Pending</span>
+ *
+ * Every value references a var(--ahs-*) token from index.css.
+ * No raw hex colors here.
+ */
+
+
+/* ═══════════════════════════════════════════════════════════════
+   PAGE SHELLS
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Detail pages (teacher profile, school detail) */
+.detailPage {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 860px;
+}
+
+/* List pages (teacher list, school list) */
+.listPage {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+}
+
+/* Create / edit form pages */
+.formPage {
+  max-width: 620px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   TOOLBAR  (back link + action buttons row)
+   ═══════════════════════════════════════════════════════════════ */
+
+.toolbar {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Text-link style back navigation */
+.backBtn {
+  background: transparent;
+  border: none;
+  color: var(--ahs-text-secondary);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0;
+  transition: color var(--ahs-transition);
+}
+
+.backBtn:hover {
+  color: var(--ahs-accent);
+  text-decoration: underline;
+}
+
+/* Right-hand action group in toolbar */
+.toolbarActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   PAGE HEADINGS
+   ═══════════════════════════════════════════════════════════════ */
+
+.pageHeading {
+  color: var(--ahs-text-primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+/* Heading + status badge on the same line */
+.titleRow {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   STATUS BADGES
+   ═══════════════════════════════════════════════════════════════ */
+
+.badge {
+  border-radius: var(--ahs-radius-pill);
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 0.2rem 0.65rem;
+  white-space: nowrap;
+}
+
+.badgeActive {
+  background: var(--ahs-accent-subtle);
+  color: var(--ahs-accent);
+}
+
+.badgeRemoved {
+  background: var(--ahs-danger-bg);
+  color: var(--ahs-danger);
+}
+
+.badgePending {
+  background: var(--ahs-amber-bg);
+  color: var(--ahs-amber);
+}
+
+/* Approved uses the same green family as Active */
+.badgeApproved {
+  background: var(--ahs-accent-subtle);
+  color: var(--ahs-accent);
+}
+
+.badgeRejected {
+  background: var(--ahs-bg-surface);
+  color: var(--ahs-text-secondary);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   ALERT NOTES  (inline status banners on detail pages)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Base — apply one modifier below alongside this */
+.alertNote {
+  border-radius: var(--ahs-radius-sm);
+  border-style: solid;
+  border-width: 1px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0.55rem 0.9rem;
+}
+
+.alertDanger {
+  background: var(--ahs-danger-bg);
+  border-color: var(--ahs-danger-border);
+  color: var(--ahs-danger);
+}
+
+.alertAmber {
+  background: var(--ahs-amber-bg);
+  border-color: var(--ahs-amber-border);
+  color: var(--ahs-amber);
+}
+
+.alertInfo {
+  background: var(--ahs-info-bg);
+  border-color: var(--ahs-info-border);
+  color: var(--ahs-info);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   CONTENT SECTIONS  (white cards within detail pages)
+   ═══════════════════════════════════════════════════════════════ */
+
+.section {
+  background: var(--ahs-bg-card);
+  border: 1px solid var(--ahs-border);
+  border-radius: var(--ahs-radius-md);
+  padding: 1.25rem 1.5rem;
+}
+
+.sectionTitle {
+  color: var(--ahs-text-secondary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin: 0 0 1rem;
+  text-transform: uppercase;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   FIELD GRID  (definition list used in detail pages)
+   ═══════════════════════════════════════════════════════════════ */
+
+.fieldGrid {
+  display: grid;
+  gap: 0.55rem 1rem;
+  grid-template-columns: 160px 1fr 160px 1fr;
+  margin: 0;
+}
+
+.dt {
+  align-self: start;
+  color: var(--ahs-text-muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  padding-top: 1px;
+}
+
+.dd {
+  color: var(--ahs-text-primary);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* Monospaced value (TIN, NIC, phone numbers) */
+.mono {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+}
+
+/* Empty / null placeholder dash */
+.nil {
+  color: var(--ahs-text-muted);
+}
+
+/* A field that spans the full right two columns */
+.wideField {
+  grid-column: span 3;
+}
+
+@media (max-width: 640px) {
+  .fieldGrid {
+    grid-template-columns: 140px 1fr;
+  }
+
+  .wideField {
+    grid-column: span 1;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   TABLE
+   ═══════════════════════════════════════════════════════════════ */
+
+.tableWrap {
+  border: 1px solid var(--ahs-border);
+  border-radius: var(--ahs-radius-md);
+  overflow: auto;
+  flex: 1;
+}
+
+.table {
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  width: 100%;
+}
+
+.table th {
+  background: var(--ahs-bg-surface);
+  border-bottom: 1px solid var(--ahs-border);
+  color: var(--ahs-text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.6rem 0.9rem;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.table td {
+  border-bottom: 1px solid var(--ahs-border-subtle);
+  color: var(--ahs-text-primary);
+  padding: 0.65rem 0.9rem;
+  vertical-align: middle;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table tbody tr:hover td {
+  background: var(--ahs-accent-subtle);
+}
+
+/* Faded row for removed/inactive records */
+.removedRow td {
+  opacity: 0.5;
+}
+
+/* Centered state cell (loading / empty) */
+.stateCell {
+  color: var(--ahs-text-muted);
+  font-size: 0.875rem;
+  padding: 2.5rem !important;
+  text-align: center;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   FILTER BAR  (above tables on list pages)
+   ═══════════════════════════════════════════════════════════════ */
+
+.filterBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.filterInput,
+.filterSelect {
+  background: var(--ahs-bg-input);
+  border: 1px solid var(--ahs-border);
+  border-radius: var(--ahs-radius-sm);
+  color: var(--ahs-text-primary);
+  font-size: 0.875rem;
+  outline: none;
+  padding: 0.4rem 0.7rem;
+  transition: border-color var(--ahs-transition), box-shadow var(--ahs-transition);
+}
+
+.filterInput {
+  flex: 1;
+  min-width: 180px;
+}
+
+.filterInput:focus,
+.filterSelect:focus {
+  border-color: var(--ahs-border-focus);
+  box-shadow: 0 0 0 3px var(--ahs-accent-ring);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   CHIPS  (multi-value display — subjects, mediums, class levels)
+   ═══════════════════════════════════════════════════════════════ */
+
+.chipList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.chip {
+  background: var(--ahs-bg-surface);
+  border: 1px solid var(--ahs-border);
+  border-radius: var(--ahs-radius-pill);
+  color: var(--ahs-text-secondary);
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 0.2rem 0.7rem;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   FORM PATTERNS  (fieldsets, fields, inputs)
+   ═══════════════════════════════════════════════════════════════ */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Grouped section of related fields */
+.fieldset {
+  border: 1px solid var(--ahs-border);
+  border-radius: var(--ahs-radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 0;
+  padding: 1.25rem;
+}
+
+.legend {
+  color: var(--ahs-text-secondary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 0 0.25rem;
+  text-transform: uppercase;
+}
+
+/* Single label + input block */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.label {
+  color: var(--ahs-text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.required {
+  color: var(--ahs-danger);
+  margin-left: 2px;
+}
+
+.formInput,
+.formSelect {
+  background: var(--ahs-bg-input);
+  border: 1px solid var(--ahs-border);
+  border-radius: var(--ahs-radius-sm);
+  color: var(--ahs-text-primary);
+  font-size: 0.875rem;
+  outline: none;
+  padding: 0.45rem 0.75rem;
+  transition: border-color var(--ahs-transition), box-shadow var(--ahs-transition), background var(--ahs-transition);
+  width: 100%;
+}
+
+.formInput:focus,
+.formSelect:focus {
+  background: var(--ahs-bg-card);
+  border-color: var(--ahs-border-focus);
+  box-shadow: 0 0 0 3px var(--ahs-accent-ring);
+}
+
+.formInput:disabled,
+.formSelect:disabled {
+  background: var(--ahs-bg-input-disabled);
+  color: var(--ahs-text-muted);
+  cursor: not-allowed;
+}
+
+/* Helper text beneath a field */
+.fieldHint {
+  color: var(--ahs-text-muted);
+  font-size: 0.78rem;
+  margin: 0;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   TIN BANNER  (create / edit form — TIN preview block)
+   ═══════════════════════════════════════════════════════════════ */
+
+.tinBanner {
+  align-items: center;
+  background: var(--ahs-accent-subtle);
+  border: 1px solid var(--ahs-accent-ring);
+  border-radius: var(--ahs-radius-md);
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.65rem 1rem;
+}
+
+.tinLabel {
+  color: var(--ahs-accent);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.tinValue {
+  color: var(--ahs-accent-hover);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+/* "Reuse" pill badge inside TIN banner */
+.tinBadge {
+  background: var(--ahs-bg-card);
+  border: 1px solid var(--ahs-border-focus);
+  border-radius: var(--ahs-radius-pill);
+  color: var(--ahs-accent);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.15rem 0.55rem;
+  text-transform: uppercase;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   FORM FOOTER ACTIONS  (save / cancel row)
+   ═══════════════════════════════════════════════════════════════ */
+
+.formActions {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  padding-top: 0.25rem;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   STATE MESSAGES  (loading, empty, error — above table or on page)
+   ═══════════════════════════════════════════════════════════════ */
+
+.stateMsg {
+  color: var(--ahs-text-muted);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.errorMsg {
+  background: var(--ahs-error-bg);
+  border: 1px solid var(--ahs-error-border);
+  border-radius: var(--ahs-radius-sm);
+  color: var(--ahs-error-text);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0.65rem 0.9rem;
+}

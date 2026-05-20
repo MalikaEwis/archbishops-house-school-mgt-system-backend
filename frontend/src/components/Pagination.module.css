@@ -1,17 +1,20 @@
+/* ── Outer bar ────────────────────────────────────────────────────────────── */
 .bar {
   align-items: center;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--ahs-border-subtle);
   display: flex;
   justify-content: space-between;
-  padding: 0.75rem 0;
   margin-top: auto;
+  padding: 0.7rem 0;
 }
 
+/* ── Record range text  e.g. "1–20 of 143" ──────────────────────────────── */
 .info {
-  color: #6b7280;
-  font-size: 0.82rem;
+  color: var(--ahs-text-muted);
+  font-size: 0.8rem;
 }
 
+/* ── Prev / page-of / Next cluster ──────────────────────────────────────── */
 .controls {
   align-items: center;
   display: flex;
@@ -19,26 +22,35 @@
 }
 
 .pages {
-  color: #374151;
-  font-size: 0.85rem;
+  color: var(--ahs-text-secondary);
+  font-size: 0.8rem;
 }
 
+/* ── Prev / Next buttons ─────────────────────────────────────────────────── */
 .btn {
-  background: #ffffff;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  color: #374151;
+  background: var(--ahs-bg-card);
+  border: 1px solid var(--ahs-border);
+  border-radius: var(--ahs-radius-sm);
+  color: var(--ahs-text-secondary);
   cursor: pointer;
-  font-size: 0.82rem;
-  padding: 0.3rem 0.7rem;
-  transition: background 0.12s;
+  font-size: 0.8rem;
+  padding: 0.3rem 0.75rem;
+  transition: background var(--ahs-transition), border-color var(--ahs-transition), color var(--ahs-transition);
 }
 
 .btn:hover:not(:disabled) {
-  background: #f3f4f6;
+  background: var(--ahs-accent-subtle);
+  border-color: var(--ahs-border-focus);
+  color: var(--ahs-accent);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--ahs-border-focus);
+  outline-offset: 2px;
 }
 
 .btn:disabled {
-  color: #d1d5db;
+  color: var(--ahs-text-muted);
   cursor: not-allowed;
+  opacity: 0.5;
 }

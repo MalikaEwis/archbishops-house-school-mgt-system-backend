@@ -1,0 +1,52 @@
+/* ── Base ─────────────────────────────────────────────────────────────────── */
+.badge {
+  border-radius: var(--ahs-radius-pill);
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 0.2rem 0.65rem;
+  white-space: nowrap;
+}
+
+/* ── Variants ─────────────────────────────────────────────────────────────── */
+
+/* Active teacher — green */
+.active {
+  background: var(--ahs-accent-subtle);
+  color: var(--ahs-accent);
+}
+
+/* Removed teacher — danger red */
+.removed {
+  background: var(--ahs-danger-bg);
+  color: var(--ahs-danger);
+}
+
+/* Pending removal request — amber */
+.pending {
+  background: var(--ahs-amber-bg);
+  color: var(--ahs-amber);
+}
+
+/*
+ * Approved removal request — danger red.
+ * An approved removal means the teacher's data was permanently cleared,
+ * so the danger family is semantically correct here.
+ */
+.approved {
+  background: var(--ahs-danger-bg);
+  color: var(--ahs-danger);
+}
+
+/* Rejected removal request — neutral gray */
+.rejected {
+  background: var(--ahs-bg-surface);
+  color: var(--ahs-text-secondary);
+}
+
+/* Fallback for unmapped status strings */
+.neutral {
+  background: var(--ahs-bg-surface);
+  color: var(--ahs-text-muted);
+}

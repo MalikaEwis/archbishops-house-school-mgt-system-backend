@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth, getRoleHome } from '../auth/AuthContext';
+import logo from '../assets/logo1.png';
 import styles from './Login.module.css';
 
 export default function Login() {
@@ -40,13 +41,22 @@ export default function Login() {
   return (
     <div className={styles.page}>
       <div className={styles.card}>
+
+        <div className={styles.logoWrap}>
+          <img src={logo} alt="Archbishop's House" className={styles.logo} />
+        </div>
+
         <div className={styles.header}>
           <h1 className={styles.title}>Archbishop's House</h1>
           <p className={styles.subtitle}>School Management System</p>
         </div>
 
+        <hr className={styles.divider} />
+
         <form onSubmit={handleSubmit} className={styles.form} noValidate>
-          {error && <p className={styles.error}>{error}</p>}
+          {error && (
+            <p className={styles.error} role="alert">{error}</p>
+          )}
 
           <div className={styles.field}>
             <label htmlFor="username" className={styles.label}>Username</label>
@@ -81,6 +91,9 @@ export default function Login() {
             {busy ? 'Signing in…' : 'Sign in'}
           </button>
         </form>
+
+        <p className={styles.footer}>Archdiocese of Colombo</p>
+
       </div>
     </div>
   );

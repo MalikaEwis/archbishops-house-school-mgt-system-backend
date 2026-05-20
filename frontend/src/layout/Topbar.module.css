@@ -1,52 +1,74 @@
+/* ── Bar ─────────────────────────────────────────────────────────────────── */
 .topbar {
   align-items: center;
-  background: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
+  background: var(--ahs-bg-card);
+  border-bottom: 1px solid var(--ahs-border);
   display: flex;
   flex-shrink: 0;
-  height: 56px;
+  height: 54px;
   justify-content: space-between;
-  padding: 0 1.5rem;
+  padding: 0 1.75rem;
 }
 
+/* ── Left slot (reserved for breadcrumbs or page title in a future phase) ── */
 .left {
   flex: 1;
 }
 
+/* ── Right slot — user identity + actions ────────────────────────────────── */
 .right {
   align-items: center;
   display: flex;
   gap: 0.75rem;
 }
 
+/* ── Username ─────────────────────────────────────────────────────────────── */
 .username {
-  color: #111827;
+  color: var(--ahs-text-primary);
   font-size: 0.875rem;
   font-weight: 600;
 }
 
+/* ── Role badge — amber/gold secondary palette ───────────────────────────── */
 .role {
-  background: #ede9fe;
-  border-radius: 9999px;
-  color: #5b21b6;
-  font-size: 0.72rem;
+  background: var(--ahs-amber-bg);
+  border: 1px solid var(--ahs-amber-border);
+  border-radius: var(--ahs-radius-pill);
+  color: var(--ahs-amber);
+  font-size: 0.7rem;
   font-weight: 600;
-  padding: 0.2rem 0.6rem;
+  letter-spacing: 0.03em;
+  padding: 0.2rem 0.65rem;
+  white-space: nowrap;
 }
 
+/* ── Divider between username and logout ─────────────────────────────────── */
+.divider {
+  background: var(--ahs-border);
+  height: 18px;
+  width: 1px;
+}
+
+/* ── Sign out button ─────────────────────────────────────────────────────── */
 .logout {
   background: transparent;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  color: #374151;
+  border: 1px solid var(--ahs-border);
+  border-radius: var(--ahs-radius-sm);
+  color: var(--ahs-text-secondary);
   cursor: pointer;
   font-size: 0.8rem;
   font-weight: 500;
-  padding: 0.35rem 0.75rem;
-  transition: background 0.15s, border-color 0.15s;
+  padding: 0.3rem 0.75rem;
+  transition: background var(--ahs-transition), border-color var(--ahs-transition), color var(--ahs-transition);
 }
 
 .logout:hover {
-  background: #f3f4f6;
-  border-color: #9ca3af;
+  background: var(--ahs-bg-surface);
+  border-color: var(--ahs-text-muted);
+  color: var(--ahs-text-primary);
+}
+
+.logout:focus-visible {
+  outline: 2px solid var(--ahs-border-focus);
+  outline-offset: 2px;
 }

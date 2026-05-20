@@ -1,0 +1,121 @@
+/* ── Outer section card ───────────────────────────────────────────────────── */
+.section {
+  align-items: center;
+  background: var(--ahs-bg-card);
+  border: 1px solid var(--ahs-border);
+  border-radius: var(--ahs-radius-md);
+  display: flex;
+  gap: 1.5rem;
+  padding: 1.25rem 1.5rem;
+}
+
+/* ── Avatar circle ───────────────────────────────────────────────────────── */
+.avatarWrap {
+  flex-shrink: 0;
+}
+
+/* Photo variant */
+.avatar {
+  border: 2px solid var(--ahs-border);
+  border-radius: 50%;
+  display: block;
+  height: 96px;
+  object-fit: cover;
+  width: 96px;
+}
+
+/* Initials fallback — accent green family */
+.initials {
+  align-items: center;
+  background: var(--ahs-accent-subtle);
+  border: 2px solid var(--ahs-border-focus);
+  border-radius: 50%;
+  color: var(--ahs-accent);
+  display: flex;
+  font-size: 1.75rem;
+  font-weight: 700;
+  height: 96px;
+  justify-content: center;
+  letter-spacing: 0.04em;
+  width: 96px;
+}
+
+/* ── Action area (admin only) ────────────────────────────────────────────── */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.btnRow {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Upload / Replace — primary style */
+.uploadBtn {
+  background: var(--ahs-accent);
+  border: 1px solid var(--ahs-accent);
+  border-radius: var(--ahs-radius-sm);
+  color: var(--ahs-text-on-accent);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 0.35rem 0.8rem;
+  transition: background var(--ahs-transition), border-color var(--ahs-transition);
+}
+
+.uploadBtn:hover:not(:disabled) {
+  background: var(--ahs-accent-hover);
+  border-color: var(--ahs-accent-hover);
+}
+
+.uploadBtn:focus-visible {
+  outline: 2px solid var(--ahs-border-focus);
+  outline-offset: 2px;
+}
+
+.uploadBtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Remove — danger outline style */
+.removeBtn {
+  background: var(--ahs-bg-card);
+  border: 1px solid var(--ahs-danger-border);
+  border-radius: var(--ahs-radius-sm);
+  color: var(--ahs-danger);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 0.35rem 0.8rem;
+  transition: background var(--ahs-transition), border-color var(--ahs-transition);
+}
+
+.removeBtn:hover:not(:disabled) {
+  background: var(--ahs-danger-bg);
+  border-color: var(--ahs-danger);
+}
+
+.removeBtn:focus-visible {
+  outline: 2px solid var(--ahs-danger);
+  outline-offset: 2px;
+}
+
+.removeBtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Hidden file input */
+.fileInput {
+  display: none;
+}
+
+/* Inline error message */
+.error {
+  color: var(--ahs-error-text);
+  font-size: 0.8rem;
+  margin: 0;
+}

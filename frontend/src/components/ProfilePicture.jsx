@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import Swal from 'sweetalert2';
-import styles from '../pages/private/TeacherDetailPage.module.css';
+import styles from './ProfilePicture.module.css';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_BYTES = 10 * 1024 * 1024;
@@ -17,8 +17,8 @@ function getInitials(name) {
 
 export default function ProfilePicture({ picturePath, name, isAdmin, onUpload, onRemove }) {
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState('');
-  const fileInputRef = useRef(null);
+  const [error, setError]         = useState('');
+  const fileInputRef              = useRef(null);
 
   async function handleFileChange(e) {
     const file = e.target.files?.[0];
@@ -51,7 +51,7 @@ export default function ProfilePicture({ picturePath, name, isAdmin, onUpload, o
       text: 'The picture will be permanently removed.',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#b91c1c',
+      confirmButtonColor: '#923328',
       cancelButtonColor: '#6b7280',
       confirmButtonText: 'Yes, remove',
       cancelButtonText: 'Cancel',
@@ -72,19 +72,19 @@ export default function ProfilePicture({ picturePath, name, isAdmin, onUpload, o
   const imgSrc = picturePath ? `/uploads/${picturePath}` : null;
 
   return (
-    <section className={styles.picSection}>
+    <section className={styles.section}>
       <div className={styles.avatarWrap}>
         {imgSrc ? (
           <img src={imgSrc} alt={name ?? 'Profile photo'} className={styles.avatar} />
         ) : (
-          <div className={styles.avatarInitials} aria-label={name ?? 'No photo'}>
+          <div className={styles.initials} aria-label={name ?? 'No photo'}>
             {getInitials(name)}
           </div>
         )}
       </div>
 
       {isAdmin && (
-        <div className={styles.picActions}>
+        <div className={styles.actions}>
           <input
             ref={fileInputRef}
             type="file"
@@ -93,9 +93,9 @@ export default function ProfilePicture({ picturePath, name, isAdmin, onUpload, o
             onChange={handleFileChange}
             disabled={uploading}
           />
-          <div className={styles.picBtnRow}>
+          <div className={styles.btnRow}>
             <button
-              className={styles.picBtn}
+              className={styles.uploadBtn}
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
             >
@@ -103,7 +103,7 @@ export default function ProfilePicture({ picturePath, name, isAdmin, onUpload, o
             </button>
             {picturePath && (
               <button
-                className={`${styles.picBtn} ${styles.picBtnDanger}`}
+                className={styles.removeBtn}
                 onClick={handleRemove}
                 disabled={uploading}
               >
@@ -111,7 +111,7 @@ export default function ProfilePicture({ picturePath, name, isAdmin, onUpload, o
               </button>
             )}
           </div>
-          {error && <p className={styles.picError}>{error}</p>}
+          {error && <p className={styles.error} role="alert">{error}</p>}
         </div>
       )}
     </section>

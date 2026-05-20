@@ -1,3 +1,6 @@
+/* ═══════════════════════════════════════════════════════════════
+   GLOBAL RESET
+   ═══════════════════════════════════════════════════════════════ */
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -23,4 +26,145 @@ a {
 button, input, select, textarea {
   font-family: inherit;
   font-size: inherit;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   DESIGN TOKENS  — Archbishop's House School Management System
+   ───────────────────────────────────────────────────────────────
+   All colors derived from the Archdiocesan coat of arms (logo2):
+     Forest green quadrant → primary accent
+     Gold/amber lion        → secondary / warnings
+     Burgundy rope border   → danger / destructive
+     Steel blue waves       → informational
+     Ivory scroll banner    → page background
+     Near-black outlines    → body text
+   ───────────────────────────────────────────────────────────────
+   Rule: no .module.css file may contain a raw hex color after
+   migration. Every value must reference a var(--ahs-*) token.
+   Dark mode works automatically — set data-theme="dark" on <html>.
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  /* ── Backgrounds ──────────────────────────────────────────── */
+  --ahs-bg-page:             #EFECE7;   /* parchment  — logo2 scroll ivory   */
+  --ahs-bg-card:             #FFFFFF;   /* white      — logo2 shield field   */
+  --ahs-bg-surface:          #F7F5F1;   /* off-white  — table headers, inset */
+  --ahs-bg-input:            #FAF9F7;
+  --ahs-bg-input-disabled:   #F2F0EB;
+
+  /* ── Borders ──────────────────────────────────────────────── */
+  --ahs-border:              #D9D4CC;   /* warm gray — heraldic rope muted   */
+  --ahs-border-subtle:       #EAE6E0;   /* row dividers, light separators    */
+  --ahs-border-focus:        #4B7A6C;   /* green focus ring                  */
+
+  /* ── Text ─────────────────────────────────────────────────── */
+  --ahs-text-primary:        #1B2B26;   /* near-black with warm green cast   */
+  --ahs-text-secondary:      #5B6E69;   /* labels, metadata, nav             */
+  --ahs-text-muted:          #8B9E99;   /* placeholders, disabled, dim info  */
+  --ahs-text-on-accent:      #FFFFFF;
+
+  /* ── Primary accent — forest green (logo2 green shield) ───── */
+  --ahs-accent:              #3B6355;
+  --ahs-accent-hover:        #2E4E43;
+  --ahs-accent-subtle:       #EBF2EF;   /* row hover, selected, light tints  */
+  --ahs-accent-disabled:     #91B5AB;
+  --ahs-accent-ring:         rgba(59, 99, 85, 0.16);
+
+  /* ── Secondary — muted amber/gold (logo2 lion quadrant) ────── */
+  --ahs-amber:               #8A6230;
+  --ahs-amber-hover:         #6E4E26;
+  --ahs-amber-bg:            #FBF6EC;
+  --ahs-amber-border:        #DBBE90;
+
+  /* ── Danger — muted burgundy (logo2 rope border) ───────────── */
+  --ahs-danger:              #923328;
+  --ahs-danger-hover:        #762819;
+  --ahs-danger-bg:           #FEF2EE;
+  --ahs-danger-border:       #F0C0A8;
+  --ahs-danger-ring:         rgba(146, 51, 40, 0.14);
+
+  /* ── Info — muted steel blue (logo2 wavy lines) ────────────── */
+  --ahs-info:                #3D6A8A;
+  --ahs-info-bg:             #EEF4F9;
+  --ahs-info-border:         #B0CCDD;
+
+  /* ── Error (form validation — same family as danger) ─────── */
+  --ahs-error-bg:            #FEF2EE;
+  --ahs-error-border:        #F0C0A8;
+  --ahs-error-text:          #9B3A28;
+
+  /* ── Elevation ────────────────────────────────────────────── */
+  --ahs-shadow-sm:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 2px 6px rgba(0, 0, 0, 0.04);
+  --ahs-shadow-card:
+    0 1px 2px  rgba(0, 0, 0, 0.04),
+    0 4px 12px rgba(0, 0, 0, 0.06),
+    0 12px 32px rgba(0, 0, 0, 0.05);
+
+  /* ── Radii ────────────────────────────────────────────────── */
+  --ahs-radius-sm:   6px;
+  --ahs-radius-md:   10px;
+  --ahs-radius-lg:   14px;
+  --ahs-radius-pill: 999px;
+
+  /* ── Transitions ──────────────────────────────────────────── */
+  --ahs-transition: 0.18s ease;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   DARK MODE SCAFFOLD
+   Inactive until something sets data-theme="dark" on <html>.
+   Every token override here is the only change needed for dark mode
+   because all component CSS uses var(--ahs-*) exclusively.
+   ═══════════════════════════════════════════════════════════════ */
+[data-theme="dark"] {
+  --ahs-bg-page:             #151E1B;
+  --ahs-bg-card:             #1D2926;
+  --ahs-bg-surface:          #1A2522;
+  --ahs-bg-input:            #243330;
+  --ahs-bg-input-disabled:   #1A2420;
+
+  --ahs-border:              #374F49;
+  --ahs-border-subtle:       #2B3F3A;
+  --ahs-border-focus:        #6AA496;
+
+  --ahs-text-primary:        #E4EDEA;
+  --ahs-text-secondary:      #8EADA8;
+  --ahs-text-muted:          #607A74;
+  --ahs-text-on-accent:      #FFFFFF;
+
+  --ahs-accent:              #5A9A88;
+  --ahs-accent-hover:        #4D8576;
+  --ahs-accent-subtle:       #1E3530;
+  --ahs-accent-disabled:     #2D5C52;
+  --ahs-accent-ring:         rgba(90, 154, 136, 0.2);
+
+  --ahs-amber:               #C49A58;
+  --ahs-amber-hover:         #B08540;
+  --ahs-amber-bg:            #272010;
+  --ahs-amber-border:        #55401A;
+
+  --ahs-danger:              #C0564A;
+  --ahs-danger-hover:        #A8443A;
+  --ahs-danger-bg:           #2B1713;
+  --ahs-danger-border:       #7A3020;
+  --ahs-danger-ring:         rgba(192, 86, 74, 0.2);
+
+  --ahs-info:                #6A9EBC;
+  --ahs-info-bg:             #131E28;
+  --ahs-info-border:         #2A4560;
+
+  --ahs-error-bg:            #2B1713;
+  --ahs-error-border:        #7A3020;
+  --ahs-error-text:          #F08878;
+
+  --ahs-shadow-sm:
+    0 1px 2px rgba(0, 0, 0, 0.2),
+    0 2px 6px rgba(0, 0, 0, 0.16);
+  --ahs-shadow-card:
+    0 1px 2px  rgba(0, 0, 0, 0.2),
+    0 4px 12px rgba(0, 0, 0, 0.28),
+    0 12px 32px rgba(0, 0, 0, 0.24);
 }
