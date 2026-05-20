@@ -10,6 +10,7 @@ import {
 } from "../../api/teachers";
 import { useAuth } from "../../auth/AuthContext";
 import ProfilePicture from "../../components/ProfilePicture";
+import StatusBadge from "../../components/StatusBadge";
 import styles from "./TeacherDetailPage.module.css";
 
 const READ_ONLY_ROLES = ["principal", "head_of_hr"];
@@ -130,7 +131,7 @@ export default function TeacherDetailPage() {
         return val;
       },
       confirmButtonText: "Submit Request",
-      confirmButtonColor: "#b91c1c",
+      confirmButtonColor: "#923328",
       showCancelButton: true,
       cancelButtonColor: "#6b7280",
       cancelButtonText: "Cancel",
@@ -149,14 +150,14 @@ export default function TeacherDetailPage() {
         title: "Request submitted",
         text: "The removal request is now pending approval by a second admin.",
         icon: "success",
-        confirmButtonColor: "#4f46e5",
+        confirmButtonColor: "#3B6355",
       });
     } catch (err) {
       await Swal.fire({
         title: "Error",
         text: err.response?.data?.message ?? "Failed to submit removal request.",
         icon: "error",
-        confirmButtonColor: "#4f46e5",
+        confirmButtonColor: "#3B6355",
       });
     }
   }
@@ -191,11 +192,7 @@ export default function TeacherDetailPage() {
       {/* ── Page title ──────────────────────────────────────────────────── */}
       <div className={styles.titleRow}>
         <h1 className={styles.heading}>{teacher.full_name}</h1>
-        {isRemoved ? (
-          <span className={styles.badgeRemoved}>Removed</span>
-        ) : (
-          <span className={styles.badgeActive}>Active</span>
-        )}
+        <StatusBadge status={isRemoved ? 'Removed' : 'Active'} />
       </div>
 
       {isRemoved && teacher.removed_reason && (
@@ -205,7 +202,7 @@ export default function TeacherDetailPage() {
       )}
 
       {pendingRequest && !isRemoved && (
-        <p className={styles.removedNote} style={{ background: "#fffbeb", borderColor: "#fde68a", color: "#92400e" }}>
+        <p className={styles.pendingNote}>
           Removal pending · Requested by <strong>{pendingRequest.requested_by_username ?? "an admin"}</strong> ·
           Reason: <strong>{REASON_LABELS[pendingRequest.reason] ?? pendingRequest.reason}</strong> ·
           Awaiting a second admin to approve.

@@ -1,8 +1,8 @@
 .page {
-  max-width: 860px;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  max-width: 860px;
 }
 
 /* ── Toolbar ─────────────────────────────────────────────────────────────── */
@@ -15,14 +15,16 @@
 .backBtn {
   background: transparent;
   border: none;
-  color: #4f46e5;
+  color: var(--ahs-accent);
   cursor: pointer;
   font-size: 0.875rem;
   font-weight: 500;
   padding: 0;
+  transition: color var(--ahs-transition);
 }
 
 .backBtn:hover {
+  color: var(--ahs-accent-hover);
   text-decoration: underline;
 }
 
@@ -33,33 +35,34 @@
 
 .editBtn,
 .removalBtn {
-  border-radius: 6px;
+  border-radius: var(--ahs-radius-sm);
   cursor: pointer;
   font-size: 0.85rem;
   font-weight: 500;
   padding: 0.4rem 0.9rem;
-  transition: background 0.12s, border-color 0.12s;
+  transition: background var(--ahs-transition), border-color var(--ahs-transition);
 }
 
 .editBtn {
-  background: #4f46e5;
-  border: 1px solid #4f46e5;
-  color: #fff;
+  background: var(--ahs-accent);
+  border: 1px solid var(--ahs-accent);
+  color: var(--ahs-text-on-accent);
 }
 
 .editBtn:hover:not(:disabled) {
-  background: #4338ca;
-  border-color: #4338ca;
+  background: var(--ahs-accent-hover);
+  border-color: var(--ahs-accent-hover);
 }
 
 .removalBtn {
-  background: #fff;
-  border: 1px solid #fca5a5;
-  color: #b91c1c;
+  background: var(--ahs-bg-card);
+  border: 1px solid var(--ahs-danger-border);
+  color: var(--ahs-danger);
 }
 
 .removalBtn:hover:not(:disabled) {
-  background: #fef2f2;
+  background: var(--ahs-danger-bg);
+  border-color: var(--ahs-danger);
 }
 
 .editBtn:disabled,
@@ -76,52 +79,45 @@
 }
 
 .heading {
-  color: #111827;
+  color: var(--ahs-text-primary);
   font-size: 1.5rem;
   font-weight: 700;
   margin: 0;
 }
 
-.badgeActive,
-.badgeRemoved {
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 0.25rem 0.7rem;
-  white-space: nowrap;
-}
-
-.badgeActive {
-  background: #dcfce7;
-  color: #166534;
-}
-
-.badgeRemoved {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
+/* Removed teacher — danger red banner */
 .removedNote {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 6px;
-  color: #b91c1c;
+  background: var(--ahs-error-bg);
+  border: 1px solid var(--ahs-error-border);
+  border-radius: var(--ahs-radius-sm);
+  color: var(--ahs-error-text);
   font-size: 0.85rem;
   margin: 0;
   padding: 0.5rem 0.85rem;
 }
 
-/* ── Section ─────────────────────────────────────────────────────────────── */
+/* Pending removal request — amber banner */
+.pendingNote {
+  background: var(--ahs-amber-bg);
+  border: 1px solid var(--ahs-amber-border);
+  border-radius: var(--ahs-radius-sm);
+  color: var(--ahs-amber);
+  font-size: 0.85rem;
+  margin: 0;
+  padding: 0.5rem 0.85rem;
+}
+
+/* ── Section card ────────────────────────────────────────────────────────── */
 .section {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  background: var(--ahs-bg-card);
+  border: 1px solid var(--ahs-border);
+  border-radius: var(--ahs-radius-md);
   padding: 1.25rem 1.5rem;
 }
 
 .sectionTitle {
-  color: #374151;
-  font-size: 0.8rem;
+  color: var(--ahs-text-muted);
+  font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   margin: 0 0 1rem;
@@ -131,26 +127,25 @@
 /* ── Definition list grid ────────────────────────────────────────────────── */
 .grid {
   display: grid;
-  grid-template-columns: 160px 1fr 160px 1fr;
   gap: 0.55rem 1rem;
+  grid-template-columns: 160px 1fr 160px 1fr;
   margin: 0;
 }
 
 .dt {
-  color: #6b7280;
+  align-self: start;
+  color: var(--ahs-text-muted);
   font-size: 0.8rem;
   font-weight: 600;
-  align-self: start;
   padding-top: 1px;
 }
 
 .dd {
-  color: #111827;
+  color: var(--ahs-text-primary);
   font-size: 0.875rem;
   margin: 0;
 }
 
-/* Wide fields span both right columns */
 .wide {
   grid-column: span 3;
 }
@@ -162,7 +157,7 @@
 }
 
 .nil {
-  color: #9ca3af;
+  color: var(--ahs-text-muted);
 }
 
 /* ── Mini table (phones) ─────────────────────────────────────────────────── */
@@ -173,20 +168,20 @@
 }
 
 .miniTable th {
-  background: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
-  color: #6b7280;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  background: var(--ahs-bg-surface);
+  border-bottom: 1px solid var(--ahs-border);
+  color: var(--ahs-text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   padding: 0.45rem 0.75rem;
   text-align: left;
   text-transform: uppercase;
 }
 
 .miniTable td {
-  border-bottom: 1px solid #f3f4f6;
-  color: #111827;
+  border-bottom: 1px solid var(--ahs-border-subtle);
+  color: var(--ahs-text-primary);
   padding: 0.5rem 0.75rem;
 }
 
@@ -202,9 +197,9 @@
 }
 
 .chip {
-  background: #ede9fe;
-  border-radius: 4px;
-  color: #5b21b6;
+  background: var(--ahs-accent-subtle);
+  border-radius: var(--ahs-radius-sm);
+  color: var(--ahs-accent);
   font-size: 0.78rem;
   font-weight: 500;
   padding: 0.2rem 0.55rem;
@@ -212,115 +207,23 @@
 
 /* ── State messages ──────────────────────────────────────────────────────── */
 .stateMsg {
-  color: #9ca3af;
+  color: var(--ahs-text-muted);
   font-size: 0.9rem;
   margin: 0;
 }
 
 .error {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 6px;
-  color: #b91c1c;
+  background: var(--ahs-error-bg);
+  border: 1px solid var(--ahs-error-border);
+  border-radius: var(--ahs-radius-sm);
+  color: var(--ahs-error-text);
   font-size: 0.875rem;
   margin: 0;
   padding: 0.65rem 0.85rem;
 }
 
 .empty {
-  color: #9ca3af;
+  color: var(--ahs-text-muted);
   font-size: 0.875rem;
-  margin: 0;
-}
-
-/* ── Profile Picture ─────────────────────────────────────────────────────── */
-.picSection {
-  align-items: center;
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  display: flex;
-  gap: 1.5rem;
-  padding: 1.25rem 1.5rem;
-}
-
-.avatarWrap {
-  flex-shrink: 0;
-}
-
-.avatar {
-  border: 2px solid #e5e7eb;
-  border-radius: 50%;
-  display: block;
-  height: 96px;
-  object-fit: cover;
-  width: 96px;
-}
-
-.avatarInitials {
-  align-items: center;
-  background: #ede9fe;
-  border: 2px solid #ddd6fe;
-  border-radius: 50%;
-  color: #5b21b6;
-  display: flex;
-  font-size: 1.75rem;
-  font-weight: 700;
-  height: 96px;
-  justify-content: center;
-  letter-spacing: 0.04em;
-  width: 96px;
-}
-
-.picActions {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.picBtnRow {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.picBtn {
-  background: #4f46e5;
-  border: 1px solid #4f46e5;
-  border-radius: 6px;
-  color: #fff;
-  cursor: pointer;
-  font-size: 0.82rem;
-  font-weight: 500;
-  padding: 0.35rem 0.75rem;
-  transition: background 0.12s, border-color 0.12s;
-}
-
-.picBtn:hover:not(:disabled) {
-  background: #4338ca;
-  border-color: #4338ca;
-}
-
-.picBtn:disabled {
-  cursor: not-allowed;
-  opacity: 0.45;
-}
-
-.picBtnDanger {
-  background: #fff;
-  border-color: #fca5a5;
-  color: #b91c1c;
-}
-
-.picBtnDanger:hover:not(:disabled) {
-  background: #fef2f2;
-}
-
-.fileInput {
-  display: none;
-}
-
-.picError {
-  color: #b91c1c;
-  font-size: 0.8rem;
   margin: 0;
 }

@@ -1,0 +1,184 @@
+/* ── Page wrapper ────────────────────────────────────────────────────────── */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 900px;
+}
+
+.heading {
+  color: var(--ahs-text-primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* ── Warning banner ──────────────────────────────────────────────────────── */
+.warningBox {
+  background: var(--ahs-amber-bg);
+  border: 1px solid var(--ahs-amber-border);
+  border-radius: var(--ahs-radius-md);
+  color: var(--ahs-amber);
+  font-size: 0.875rem;
+  padding: 0.75rem 1rem;
+}
+
+/* ── Upload form ─────────────────────────────────────────────────────────── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.fileLabel {
+  color: var(--ahs-text-primary);
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+}
+
+.fileName {
+  color: var(--ahs-text-muted);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+.importBtn {
+  background: var(--ahs-danger);
+  border: 1px solid var(--ahs-danger);
+  border-radius: var(--ahs-radius-sm);
+  color: var(--ahs-text-on-accent);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.5rem 1.2rem;
+  transition: background var(--ahs-transition), border-color var(--ahs-transition);
+}
+
+.importBtn:hover:not(:disabled) {
+  background: var(--ahs-danger-hover);
+  border-color: var(--ahs-danger-hover);
+}
+
+.importBtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* ── Status messages ─────────────────────────────────────────────────────── */
+.errorMsg {
+  color: var(--ahs-danger);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.successMsg {
+  color: var(--ahs-accent);
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* ── Results list ────────────────────────────────────────────────────────── */
+.resultList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ── StatsBlock card ─────────────────────────────────────────────────────── */
+.statsBlock {
+  background: var(--ahs-bg-surface);
+  border: 1px solid var(--ahs-border);
+  border-radius: var(--ahs-radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+}
+
+.statsTitle {
+  color: var(--ahs-text-primary);
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.counts {
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+  gap: 1.5rem;
+}
+
+.countInserted   { color: var(--ahs-accent); }
+.countPlaceholder { color: var(--ahs-info); }
+.countSkipped    { color: var(--ahs-amber); }
+.countError      { color: var(--ahs-danger); }
+.countNeutral    { color: var(--ahs-text-muted); }
+
+/* ── Section within a StatsBlock ─────────────────────────────────────────── */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.sectionTitle {
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.sectionInserted   { color: var(--ahs-accent); }
+.sectionPlaceholder { color: var(--ahs-info); }
+.sectionSkipped    { color: var(--ahs-amber); }
+.sectionError      { color: var(--ahs-danger); }
+
+.emptyMsg {
+  color: var(--ahs-text-muted);
+  font-size: 0.8rem;
+  margin: 0;
+}
+
+/* ── Scrollable detail table ─────────────────────────────────────────────── */
+.scrollWrap {
+  border: 1px solid var(--ahs-border);
+  border-radius: var(--ahs-radius-sm);
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.detailTable {
+  border-collapse: collapse;
+  font-size: 0.78rem;
+  width: 100%;
+}
+
+.detailTable th {
+  background: var(--ahs-bg-surface);
+  border-bottom: 1px solid var(--ahs-border);
+  color: var(--ahs-text-secondary);
+  font-weight: 600;
+  padding: 0.4rem 0.6rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.detailTable td {
+  border-bottom: 1px solid var(--ahs-border-subtle);
+  color: var(--ahs-text-primary);
+  padding: 0.35rem 0.6rem;
+  vertical-align: top;
+}
+
+.detailTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tdMono    { font-family: 'Courier New', monospace; }
+.tdInfo    { color: var(--ahs-info); }
+.tdAmber   { color: var(--ahs-amber); }
+.tdDanger  { color: var(--ahs-danger); }
+.tdMuted   { color: var(--ahs-text-muted); }

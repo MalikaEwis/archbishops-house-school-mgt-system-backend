@@ -1,16 +1,16 @@
 .page {
-  max-width: 600px;
+  max-width: 620px;
 }
 
 .heading {
-  color: #111827;
+  color: var(--ahs-text-primary);
   font-size: 1.375rem;
   font-weight: 700;
   margin: 0 0 1rem;
 }
 
 .loadingMsg {
-  color: #9ca3af;
+  color: var(--ahs-text-muted);
   font-size: 0.9rem;
   margin: 0;
 }
@@ -18,9 +18,9 @@
 /* ── TIN banner ──────────────────────────────────────────────────────────── */
 .tinBanner {
   align-items: center;
-  background: #f5f3ff;
-  border: 1px solid #ddd6fe;
-  border-radius: 8px;
+  background: var(--ahs-accent-subtle);
+  border: 1px solid var(--ahs-border-focus);
+  border-radius: var(--ahs-radius-md);
   display: flex;
   gap: 0.75rem;
   margin-bottom: 0.25rem;
@@ -28,7 +28,7 @@
 }
 
 .tinLabel {
-  color: #6d28d9;
+  color: var(--ahs-accent);
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.07em;
@@ -37,7 +37,7 @@
 }
 
 .tinValue {
-  color: #3730a3;
+  color: var(--ahs-text-primary);
   font-family: 'Courier New', monospace;
   font-size: 1rem;
   font-weight: 700;
@@ -45,14 +45,15 @@
 }
 
 .tinMuted {
-  color: #a78bfa;
+  color: var(--ahs-text-muted);
   font-size: 0.85rem;
 }
 
 .tinReuse {
-  background: #ede9fe;
-  border-radius: 9999px;
-  color: #5b21b6;
+  background: var(--ahs-accent-subtle);
+  border: 1px solid var(--ahs-border-focus);
+  border-radius: var(--ahs-radius-pill);
+  color: var(--ahs-accent);
   font-size: 0.72rem;
   font-weight: 600;
   padding: 0.15rem 0.55rem;
@@ -66,10 +67,10 @@
 }
 
 .error {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 6px;
-  color: #b91c1c;
+  background: var(--ahs-error-bg);
+  border: 1px solid var(--ahs-error-border);
+  border-radius: var(--ahs-radius-sm);
+  color: var(--ahs-error-text);
   font-size: 0.875rem;
   margin: 0;
   padding: 0.65rem 0.85rem;
@@ -77,17 +78,17 @@
 
 /* ── Fieldset ────────────────────────────────────────────────────────────── */
 .fieldset {
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid var(--ahs-border);
+  border-radius: var(--ahs-radius-md);
   display: flex;
   flex-direction: column;
   gap: 1rem;
   margin: 0;
-  padding: 1.25rem 1.25rem 1.25rem;
+  padding: 1.25rem;
 }
 
 .legend {
-  color: #374151;
+  color: var(--ahs-text-secondary);
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -103,51 +104,46 @@
 }
 
 .label {
-  color: #374151;
+  color: var(--ahs-text-secondary);
   font-size: 0.85rem;
   font-weight: 500;
 }
 
 .required {
-  color: #b91c1c;
+  color: var(--ahs-danger);
   margin-left: 2px;
 }
 
 .input,
 .select {
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  color: #111827;
+  background: var(--ahs-bg-input);
+  border: 1px solid var(--ahs-border);
+  border-radius: var(--ahs-radius-sm);
+  box-sizing: border-box;
+  color: var(--ahs-text-primary);
   font-size: 0.875rem;
   outline: none;
   padding: 0.45rem 0.7rem;
-  transition: border-color 0.15s;
+  transition: border-color var(--ahs-transition), box-shadow var(--ahs-transition);
   width: 100%;
-  box-sizing: border-box;
 }
 
 .input:focus,
 .select:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  border-color: var(--ahs-border-focus);
+  box-shadow: 0 0 0 3px var(--ahs-accent-ring);
 }
 
 .input:disabled,
 .select:disabled {
-  background: #f9fafb;
-  color: #9ca3af;
+  background: var(--ahs-bg-input-disabled);
+  color: var(--ahs-text-muted);
   cursor: not-allowed;
 }
 
 .fieldHint {
-  color: #6b7280;
+  color: var(--ahs-text-muted);
   font-size: 0.78rem;
-  margin: 0;
-}
-
-.hint {
-  color: #6b7280;
-  font-size: 0.82rem;
   margin: 0;
 }
 
@@ -161,8 +157,8 @@
 .phoneRow {
   align-items: center;
   display: flex;
-  gap: 0.5rem;
   flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .phoneRow .input {
@@ -176,7 +172,7 @@
 
 .primaryLabel {
   align-items: center;
-  color: #374151;
+  color: var(--ahs-text-secondary);
   display: flex;
   font-size: 0.85rem;
   gap: 0.3rem;
@@ -184,23 +180,24 @@
 }
 
 .primaryLabel input[type="radio"] {
-  accent-color: #4f46e5;
+  accent-color: var(--ahs-accent);
   cursor: pointer;
 }
 
 .phoneRemoveBtn {
   background: none;
-  border: 1px solid #fca5a5;
-  border-radius: 5px;
-  color: #b91c1c;
+  border: 1px solid var(--ahs-danger-border);
+  border-radius: var(--ahs-radius-sm);
+  color: var(--ahs-danger);
   cursor: pointer;
   font-size: 0.8rem;
   padding: 0.3rem 0.6rem;
-  transition: background 0.12s;
+  transition: background var(--ahs-transition), border-color var(--ahs-transition);
 }
 
 .phoneRemoveBtn:hover:not(:disabled) {
-  background: #fef2f2;
+  background: var(--ahs-danger-bg);
+  border-color: var(--ahs-danger);
 }
 
 .phoneRemoveBtn:disabled {
@@ -210,19 +207,21 @@
 
 .addPhoneBtn {
   background: none;
-  border: 1px dashed #a5b4fc;
-  border-radius: 6px;
-  color: #4f46e5;
+  border: 1px dashed var(--ahs-border);
+  border-radius: var(--ahs-radius-sm);
+  color: var(--ahs-text-secondary);
   cursor: pointer;
   font-size: 0.85rem;
   font-weight: 500;
   margin-top: 0.25rem;
   padding: 0.4rem 0.85rem;
-  transition: background 0.12s;
+  transition: background var(--ahs-transition), border-color var(--ahs-transition), color var(--ahs-transition);
 }
 
 .addPhoneBtn:hover:not(:disabled) {
-  background: #eef2ff;
+  background: var(--ahs-accent-subtle);
+  border-color: var(--ahs-border-focus);
+  color: var(--ahs-accent);
 }
 
 .addPhoneBtn:disabled {
@@ -240,7 +239,7 @@
 
 .checkLabel {
   align-items: center;
-  color: #374151;
+  color: var(--ahs-text-primary);
   cursor: pointer;
   display: flex;
   font-size: 0.875rem;
@@ -248,7 +247,7 @@
 }
 
 .checkLabel input[type="checkbox"] {
-  accent-color: #4f46e5;
+  accent-color: var(--ahs-accent);
   cursor: pointer;
   height: 15px;
   width: 15px;
@@ -262,26 +261,27 @@
 /* ── Tag input ──────────────────────────────────────────────────────────── */
 .tagInputWrap {
   align-items: center;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  background: var(--ahs-bg-input);
+  border: 1px solid var(--ahs-border);
+  border-radius: var(--ahs-radius-sm);
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem;
   min-height: 38px;
   padding: 0.3rem 0.5rem;
-  transition: border-color 0.15s;
+  transition: border-color var(--ahs-transition), box-shadow var(--ahs-transition);
 }
 
 .tagInputWrap:focus-within {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  border-color: var(--ahs-border-focus);
+  box-shadow: 0 0 0 3px var(--ahs-accent-ring);
 }
 
 .tag {
   align-items: center;
-  background: #ede9fe;
-  border-radius: 4px;
-  color: #5b21b6;
+  background: var(--ahs-accent-subtle);
+  border-radius: var(--ahs-radius-sm);
+  color: var(--ahs-accent);
   display: inline-flex;
   font-size: 0.8rem;
   font-weight: 500;
@@ -292,15 +292,16 @@
 .tagRemove {
   background: none;
   border: none;
-  color: #7c3aed;
+  color: var(--ahs-accent);
   cursor: pointer;
   font-size: 0.95rem;
   line-height: 1;
   padding: 0;
+  transition: color var(--ahs-transition);
 }
 
 .tagRemove:hover {
-  color: #5b21b6;
+  color: var(--ahs-accent-hover);
 }
 
 .tagRemove:disabled {
@@ -309,8 +310,9 @@
 }
 
 .tagInput {
+  background: transparent;
   border: none;
-  color: #111827;
+  color: var(--ahs-text-primary);
   flex: 1;
   font-size: 0.875rem;
   min-width: 180px;
@@ -329,33 +331,34 @@
 
 .cancelBtn,
 .submitBtn {
-  border-radius: 6px;
+  border-radius: var(--ahs-radius-sm);
   cursor: pointer;
   font-size: 0.875rem;
   font-weight: 600;
   padding: 0.5rem 1.2rem;
-  transition: background 0.12s, border-color 0.12s;
+  transition: background var(--ahs-transition), border-color var(--ahs-transition), color var(--ahs-transition);
 }
 
 .cancelBtn {
-  background: #fff;
-  border: 1px solid #d1d5db;
-  color: #374151;
+  background: var(--ahs-bg-card);
+  border: 1px solid var(--ahs-border);
+  color: var(--ahs-text-primary);
 }
 
 .cancelBtn:hover:not(:disabled) {
-  background: #f3f4f6;
+  background: var(--ahs-bg-surface);
+  border-color: var(--ahs-text-muted);
 }
 
 .submitBtn {
-  background: #4f46e5;
-  border: 1px solid #4f46e5;
-  color: #fff;
+  background: var(--ahs-accent);
+  border: 1px solid var(--ahs-accent);
+  color: var(--ahs-text-on-accent);
 }
 
 .submitBtn:hover:not(:disabled) {
-  background: #4338ca;
-  border-color: #4338ca;
+  background: var(--ahs-accent-hover);
+  border-color: var(--ahs-accent-hover);
 }
 
 .cancelBtn:disabled,

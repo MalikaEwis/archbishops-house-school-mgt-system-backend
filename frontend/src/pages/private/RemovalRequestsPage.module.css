@@ -1,0 +1,76 @@
+/* ── Status filter tabs ───────────────────────────────────────────────────── */
+.tabs {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.tab {
+  background: transparent;
+  border: 1px solid var(--ahs-border);
+  border-radius: var(--ahs-radius-sm);
+  color: var(--ahs-text-secondary);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 0.3rem 0.9rem;
+  transition: background var(--ahs-transition), border-color var(--ahs-transition), color var(--ahs-transition);
+}
+
+.tab:hover {
+  background: var(--ahs-accent-subtle);
+  border-color: var(--ahs-border-focus);
+  color: var(--ahs-accent);
+}
+
+.tabActive {
+  background: var(--ahs-accent);
+  border-color: var(--ahs-accent);
+  color: var(--ahs-text-on-accent);
+}
+
+.tabActive:hover {
+  background: var(--ahs-accent-hover);
+  border-color: var(--ahs-accent-hover);
+  color: var(--ahs-text-on-accent);
+}
+
+/* ── Inline action buttons inside the requests table ─────────────────────── */
+.approveBtn {
+  background: var(--ahs-bg-card);
+  border: 1px solid var(--ahs-danger-border);
+  border-radius: var(--ahs-radius-sm);
+  color: var(--ahs-danger);
+  cursor: pointer;
+  font-size: 0.78rem;
+  margin-right: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  transition: background var(--ahs-transition), border-color var(--ahs-transition);
+}
+
+.approveBtn:hover {
+  background: var(--ahs-danger-bg);
+  border-color: var(--ahs-danger);
+}
+
+.rejectBtn {
+  background: var(--ahs-bg-card);
+  border: 1px solid var(--ahs-border);
+  border-radius: var(--ahs-radius-sm);
+  color: var(--ahs-text-secondary);
+  cursor: pointer;
+  font-size: 0.78rem;
+  margin-right: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  transition: background var(--ahs-transition), border-color var(--ahs-transition);
+}
+
+.rejectBtn:hover {
+  background: var(--ahs-bg-surface);
+}
+
+/* ── Rejection note under a rejected row's badge ─────────────────────────── */
+.rejectionNote {
+  color: var(--ahs-text-muted);
+  font-size: 0.75rem;
+  margin: 0.2rem 0 0;
+}

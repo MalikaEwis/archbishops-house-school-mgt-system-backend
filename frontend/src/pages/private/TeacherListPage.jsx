@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { fetchTeachers } from '../../api/teachers';
 import { useAuth } from '../../auth/AuthContext';
 import Pagination from '../../components/Pagination';
+import StatusBadge from '../../components/StatusBadge';
 import styles from './TeacherListPage.module.css';
 
 const READ_ONLY_ROLES = ['principal', 'head_of_hr'];
@@ -191,10 +192,7 @@ export default function TeacherListPage() {
                 <td className={styles.mono}>{t.nic ?? '—'}</td>
                 <td>{t.school_name ?? '—'}</td>
                 <td>
-                  {t.is_active
-                    ? <span className={styles.badgeActive}>Active</span>
-                    : <span className={styles.badgeRemoved}>Removed</span>
-                  }
+                  <StatusBadge status={t.is_active ? 'Active' : 'Removed'} />
                 </td>
                 <td>
                   <button

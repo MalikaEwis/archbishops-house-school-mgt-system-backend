@@ -2,52 +2,27 @@ import { useState, useRef } from 'react';
 import Swal from 'sweetalert2';
 import { useAuth } from '../../auth/AuthContext';
 import { resetImportPrivate, resetImportInternational } from '../../api/admin';
-import detailStyles from './TeacherDetailPage.module.css';
+import styles from './AdminImportPage.module.css';
 
 const LABEL = {
   admin_private:       'Private Schools',
   admin_international: 'International Schools',
 };
 
-// ─── Shared table styles ──────────────────────────────────────────────────────
-
-const tbl = {
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse',
-    fontSize: '0.78rem',
-  },
-  th: {
-    background: '#f3f4f6',
-    borderBottom: '1px solid #e5e7eb',
-    color: '#374151',
-    fontWeight: 600,
-    padding: '0.4rem 0.6rem',
-    textAlign: 'left',
-    whiteSpace: 'nowrap',
-  },
-  td: {
-    borderBottom: '1px solid #f3f4f6',
-    color: '#374151',
-    padding: '0.35rem 0.6rem',
-    verticalAlign: 'top',
-  },
-  scroll: {
-    maxHeight: '260px',
-    overflowY: 'auto',
-    border: '1px solid #e5e7eb',
-    borderRadius: '6px',
-  },
-};
-
 // ─── Section wrapper ──────────────────────────────────────────────────────────
 
-function Section({ title, accent, children }) {
+const SECTION_TITLE_CLASS = {
+  placeholder: styles.sectionPlaceholder,
+  skipped:     styles.sectionSkipped,
+  error:       styles.sectionError,
+  inserted:    styles.sectionInserted,
+};
+
+function Section({ title, type, children }) {
+  const titleClass = SECTION_TITLE_CLASS[type] ?? styles.sectionError;
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-      <p style={{ fontWeight: 600, fontSize: '0.82rem', color: accent, margin: 0 }}>
-        {title}
-      </p>
+    <div className={styles.section}>
+      <p className={`${styles.sectionTitle} ${titleClass}`}>{title}</p>
       {children}
     </div>
   );
@@ -57,28 +32,28 @@ function Section({ title, accent, children }) {
 
 function PlaceholdersDetail({ rows }) {
   if (!rows || rows.length === 0) {
-    return <p style={{ color: '#6b7280', fontSize: '0.8rem', margin: 0 }}>No placeholder rows inserted.</p>;
+    return <p className={styles.emptyMsg}>No placeholder rows inserted.</p>;
   }
   return (
-    <div style={tbl.scroll}>
-      <table style={tbl.table}>
+    <div className={styles.scrollWrap}>
+      <table className={styles.detailTable}>
         <thead>
           <tr>
-            <th style={tbl.th}>Sheet</th>
-            <th style={tbl.th}>Row</th>
-            <th style={tbl.th}>TIN</th>
-            <th style={tbl.th}>School</th>
-            <th style={tbl.th}>Placeholder NIC</th>
+            <th>Sheet</th>
+            <th>Row</th>
+            <th>TIN</th>
+            <th>School</th>
+            <th>Placeholder NIC</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((r, i) => (
             <tr key={i}>
-              <td style={tbl.td}>{r.sheet}</td>
-              <td style={{ ...tbl.td, fontFamily: 'monospace' }}>{r.row}</td>
-              <td style={{ ...tbl.td, fontFamily: 'monospace' }}>{r.tin}</td>
-              <td style={tbl.td}>{r.school}</td>
-              <td style={{ ...tbl.td, fontFamily: 'monospace', color: '#6366f1' }}>{r.placeholderNic}</td>
+              <td>{r.sheet}</td>
+              <td className={styles.tdMono}>{r.row}</td>
+              <td className={styles.tdMono}>{r.tin}</td>
+              <td>{r.school}</td>
+              <td className={`${styles.tdMono} ${styles.tdInfo}`}>{r.placeholderNic}</td>
             </tr>
           ))}
         </tbody>
@@ -91,28 +66,28 @@ function PlaceholdersDetail({ rows }) {
 
 function SkippedDetail({ rows }) {
   if (!rows || rows.length === 0) {
-    return <p style={{ color: '#6b7280', fontSize: '0.8rem', margin: 0 }}>No rows skipped.</p>;
+    return <p className={styles.emptyMsg}>No rows skipped.</p>;
   }
   return (
-    <div style={tbl.scroll}>
-      <table style={tbl.table}>
+    <div className={styles.scrollWrap}>
+      <table className={styles.detailTable}>
         <thead>
           <tr>
-            <th style={tbl.th}>Sheet</th>
-            <th style={tbl.th}>Row</th>
-            <th style={tbl.th}>Teacher</th>
-            <th style={tbl.th}>School</th>
-            <th style={tbl.th}>Reason</th>
+            <th>Sheet</th>
+            <th>Row</th>
+            <th>Teacher</th>
+            <th>School</th>
+            <th>Reason</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((r, i) => (
             <tr key={i}>
-              <td style={tbl.td}>{r.sheet}</td>
-              <td style={{ ...tbl.td, fontFamily: 'monospace' }}>{r.row}</td>
-              <td style={tbl.td}>{r.name ?? <span style={{ color: '#9ca3af' }}>—</span>}</td>
-              <td style={tbl.td}>{r.school}</td>
-              <td style={{ ...tbl.td, color: '#ca8a04' }}>{r.reason}</td>
+              <td>{r.sheet}</td>
+              <td className={styles.tdMono}>{r.row}</td>
+              <td>{r.name ?? <span className={styles.tdMuted}>—</span>}</td>
+              <td>{r.school}</td>
+              <td className={styles.tdAmber}>{r.reason}</td>
             </tr>
           ))}
         </tbody>
@@ -125,24 +100,24 @@ function SkippedDetail({ rows }) {
 
 function ErrorsDetail({ rows }) {
   if (!rows || rows.length === 0) {
-    return <p style={{ color: '#6b7280', fontSize: '0.8rem', margin: 0 }}>No errors.</p>;
+    return <p className={styles.emptyMsg}>No errors.</p>;
   }
   return (
-    <div style={tbl.scroll}>
-      <table style={tbl.table}>
+    <div className={styles.scrollWrap}>
+      <table className={styles.detailTable}>
         <thead>
           <tr>
-            <th style={tbl.th}>Sheet</th>
-            <th style={tbl.th}>Row</th>
-            <th style={tbl.th}>Error</th>
+            <th>Sheet</th>
+            <th>Row</th>
+            <th>Error</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((r, i) => (
             <tr key={i}>
-              <td style={tbl.td}>{r.sheet}</td>
-              <td style={{ ...tbl.td, fontFamily: 'monospace' }}>{r.row}</td>
-              <td style={{ ...tbl.td, color: '#dc2626' }}>{r.message}</td>
+              <td>{r.sheet}</td>
+              <td className={styles.tdMono}>{r.row}</td>
+              <td className={styles.tdDanger}>{r.message}</td>
             </tr>
           ))}
         </tbody>
@@ -155,46 +130,33 @@ function ErrorsDetail({ rows }) {
 
 function StatsBlock({ label, stats }) {
   return (
-    <div style={{
-      background: '#f9fafb',
-      border: '1px solid #e5e7eb',
-      borderRadius: '8px',
-      padding: '1rem 1.25rem',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '1rem',
-    }}>
-      {/* Title */}
-      <p style={{ fontWeight: 700, margin: 0, fontSize: '0.9rem' }}>{label}</p>
+    <div className={styles.statsBlock}>
+      <p className={styles.statsTitle}>{label}</p>
 
-      {/* Summary counts */}
-      <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', fontSize: '0.85rem' }}>
-        <span style={{ color: '#16a34a' }}>
+      <div className={styles.counts}>
+        <span className={styles.countInserted}>
           Inserted: <strong>{stats.inserted}</strong>
         </span>
-        <span style={{ color: '#6366f1' }}>
+        <span className={styles.countPlaceholder}>
           Placeholders: <strong>{stats.placeholders}</strong>
         </span>
-        <span style={{ color: '#ca8a04' }}>
+        <span className={styles.countSkipped}>
           Skipped: <strong>{stats.skipped}</strong>
         </span>
-        <span style={{ color: stats.errors > 0 ? '#dc2626' : '#6b7280' }}>
+        <span className={stats.errors > 0 ? styles.countError : styles.countNeutral}>
           Errors: <strong>{stats.errors}</strong>
         </span>
       </div>
 
-      {/* Placeholder rows */}
-      <Section title={`Placeholder rows (${stats.placeholders})`} accent="#6366f1">
+      <Section title={`Placeholder rows (${stats.placeholders})`} type="placeholder">
         <PlaceholdersDetail rows={stats.placeholderDetails} />
       </Section>
 
-      {/* Skipped rows */}
-      <Section title={`Skipped rows (${stats.skipped})`} accent="#ca8a04">
+      <Section title={`Skipped rows (${stats.skipped})`} type="skipped">
         <SkippedDetail rows={stats.skippedDetails} />
       </Section>
 
-      {/* Errors */}
-      <Section title={`Errors (${stats.errors})`} accent="#dc2626">
+      <Section title={`Errors (${stats.errors})`} type="error">
         <ErrorsDetail rows={stats.errorDetails} />
       </Section>
     </div>
@@ -230,7 +192,7 @@ export default function AdminImportPage() {
       html: `<p>This will <strong>permanently delete all existing ${moduleLabel} teacher data</strong> and replace it with the uploaded file.</p><p style="margin-top:0.5rem"><strong>This cannot be undone.</strong></p>`,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#b91c1c',
+      confirmButtonColor: '#923328',
       cancelButtonColor: '#6b7280',
       confirmButtonText: 'Yes, reset and import',
       cancelButtonText: 'Cancel',
@@ -255,34 +217,24 @@ export default function AdminImportPage() {
   }
 
   return (
-    <div className={detailStyles.page} style={{ maxWidth: '900px' }}>
-      <h1 className={detailStyles.heading}>Import / Reset — {moduleLabel}</h1>
+    <div className={styles.page}>
+      <h1 className={styles.heading}>Import / Reset — {moduleLabel}</h1>
 
-      <div style={{
-        background: '#fef3c7',
-        border: '1px solid #fde68a',
-        borderRadius: '8px',
-        color: '#92400e',
-        fontSize: '0.875rem',
-        padding: '0.75rem 1rem',
-      }}>
+      <div className={styles.warningBox}>
         <strong>Warning:</strong> Uploading a file will <strong>erase all current {moduleLabel} teacher records</strong> and replace them with the contents of the XLSX file. This action is irreversible.
       </div>
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <form onSubmit={handleSubmit} className={styles.form}>
         <div>
-          <label style={{ display: 'block', fontWeight: 500, marginBottom: '0.4rem', fontSize: '0.875rem' }}>
-            Select XLSX file
-          </label>
+          <label className={styles.fileLabel}>Select XLSX file</label>
           <input
             ref={fileInputRef}
             type="file"
             accept=".xlsx,.xls"
             onChange={handleFileChange}
-            style={{ fontSize: '0.875rem' }}
           />
           {file && (
-            <p style={{ color: '#6b7280', fontSize: '0.8rem', marginTop: '0.25rem' }}>
+            <p className={styles.fileName}>
               {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
             </p>
           )}
@@ -292,24 +244,21 @@ export default function AdminImportPage() {
           <button
             type="submit"
             disabled={!file || loading}
-            className={detailStyles.removalBtn}
-            style={{ opacity: !file || loading ? 0.5 : 1 }}
+            className={styles.importBtn}
           >
             {loading ? 'Importing…' : 'Reset & Import'}
           </button>
         </div>
       </form>
 
-      {error && (
-        <p style={{ color: '#dc2626', fontSize: '0.875rem' }}>{error}</p>
-      )}
+      {error && <p className={styles.errorMsg}>{error}</p>}
 
       {result && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <p style={{ fontWeight: 600, color: '#16a34a', margin: 0 }}>Import complete.</p>
-          {result.active        && <StatsBlock label="Active teachers"         stats={result.active} />}
-          {result.retired       && <StatsBlock label="Retired teachers"        stats={result.retired} />}
-          {result.international && <StatsBlock label="International teachers"  stats={result.international} />}
+        <div className={styles.resultList}>
+          <p className={styles.successMsg}>Import complete.</p>
+          {result.active        && <StatsBlock label="Active teachers"        stats={result.active} />}
+          {result.retired       && <StatsBlock label="Retired teachers"       stats={result.retired} />}
+          {result.international && <StatsBlock label="International teachers" stats={result.international} />}
         </div>
       )}
     </div>
