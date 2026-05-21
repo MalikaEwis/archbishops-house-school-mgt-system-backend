@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
-import styles from './Sidebar.module.css';
+import logo        from '../assets/logo1.png';
+import styles      from './Sidebar.module.css';
 
 const ROLE_LABELS = {
   admin_private:       'Private Schools',
@@ -46,6 +47,7 @@ export default function Sidebar() {
   return (
     <aside className={styles.sidebar}>
       <div className={styles.brand}>
+        <img src={logo} alt="Archbishop's House" className={styles.logo} />
         <span className={styles.brandShort}>AHS</span>
         <span className={styles.brandFull}>Archbishop's House</span>
       </div>

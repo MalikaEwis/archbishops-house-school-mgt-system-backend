@@ -76,6 +76,13 @@ button, input, select, textarea {
   --ahs-amber-bg:            #FBF6EC;
   --ahs-amber-border:        #DBBE90;
 
+  /* ── Orange — logo2 shield orange quadrant (#D07829) ───────── */
+  --ahs-orange:              #D07829;
+  --ahs-orange-hover:        #B5641E;
+  --ahs-orange-subtle:       #FDF4E8;
+  --ahs-orange-border:       #E8B87A;
+  --ahs-orange-ring:         rgba(208, 120, 41, 0.16);
+
   /* ── Danger — muted burgundy (logo2 rope border) ───────────── */
   --ahs-danger:              #923328;
   --ahs-danger-hover:        #762819;
@@ -146,6 +153,12 @@ button, input, select, textarea {
   --ahs-amber-bg:            #272010;
   --ahs-amber-border:        #55401A;
 
+  --ahs-orange:              #E8942E;
+  --ahs-orange-hover:        #D07829;
+  --ahs-orange-subtle:       #2A1A08;
+  --ahs-orange-border:       #6A3A10;
+  --ahs-orange-ring:         rgba(232, 148, 46, 0.2);
+
   --ahs-danger:              #C0564A;
   --ahs-danger-hover:        #A8443A;
   --ahs-danger-bg:           #2B1713;
@@ -167,4 +180,72 @@ button, input, select, textarea {
     0 1px 2px  rgba(0, 0, 0, 0.2),
     0 4px 12px rgba(0, 0, 0, 0.28),
     0 12px 32px rgba(0, 0, 0, 0.24);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   SWEETALERT2 DARK MODE OVERRIDES
+   Only active when data-theme="dark" is on <html>.
+   Targets the SweetAlert2 popup and its inner elements so modals
+   match the dark-mode design tokens without importing a Swal theme.
+   ═══════════════════════════════════════════════════════════════ */
+[data-theme="dark"] .swal2-popup {
+  background: var(--ahs-bg-card);
+  border: 1px solid var(--ahs-border);
+  box-shadow: var(--ahs-shadow-card);
+  color: var(--ahs-text-primary);
+}
+
+[data-theme="dark"] .swal2-title {
+  color: var(--ahs-text-primary);
+}
+
+[data-theme="dark"] .swal2-html-container,
+[data-theme="dark"] .swal2-content {
+  color: var(--ahs-text-secondary);
+}
+
+[data-theme="dark"] .swal2-input,
+[data-theme="dark"] .swal2-select,
+[data-theme="dark"] .swal2-textarea {
+  background: var(--ahs-bg-input);
+  border-color: var(--ahs-border);
+  color: var(--ahs-text-primary);
+}
+
+[data-theme="dark"] .swal2-input::placeholder,
+[data-theme="dark"] .swal2-textarea::placeholder {
+  color: var(--ahs-text-muted);
+}
+
+[data-theme="dark"] .swal2-input-label {
+  color: var(--ahs-text-secondary);
+}
+
+[data-theme="dark"] .swal2-validation-message {
+  background: var(--ahs-error-bg);
+  color: var(--ahs-error-text);
+}
+
+[data-theme="dark"] .swal2-icon.swal2-warning {
+  border-color: var(--ahs-amber);
+  color: var(--ahs-amber);
+}
+
+[data-theme="dark"] .swal2-icon.swal2-error {
+  border-color: var(--ahs-danger);
+  color: var(--ahs-danger);
+}
+
+[data-theme="dark"] .swal2-icon.swal2-success {
+  border-color: var(--ahs-accent);
+  color: var(--ahs-accent);
+}
+
+[data-theme="dark"] .swal2-icon.swal2-success [class^="swal2-success-line"] {
+  background: var(--ahs-accent);
+}
+
+[data-theme="dark"] .swal2-icon.swal2-success .swal2-success-ring {
+  border-color: var(--ahs-accent-subtle);
 }

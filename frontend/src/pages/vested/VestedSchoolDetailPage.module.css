@@ -1,0 +1,120 @@
+.indexBadge {
+  background: var(--ahs-accent-subtle);
+  border: 1px solid var(--ahs-border-focus);
+  border-radius: var(--ahs-radius-pill);
+  color: var(--ahs-accent);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.2rem 0.65rem;
+}
+
+.adminActions {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.statsBar {
+  margin-bottom: 1rem;
+}
+
+/* ── Inline form panel ─────────────────────────────────────────────────────── */
+
+.inlineForm {
+  background: var(--ahs-bg-card);
+  border: 1px solid var(--ahs-border);
+  border-radius: var(--ahs-radius-md);
+  margin-bottom: 1rem;
+  padding: 1rem 1.1rem;
+}
+
+.formTitle {
+  color: var(--ahs-text-primary);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.85rem;
+  text-transform: uppercase;
+}
+
+.formError {
+  margin-bottom: 0.75rem;
+}
+
+/* ── Form grid layouts ─────────────────────────────────────────────────────── */
+
+.twoCol {
+  display: grid;
+  gap: 0.65rem 1rem;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 0.85rem;
+}
+
+.threeCol {
+  display: grid;
+  gap: 0.65rem 1rem;
+  grid-template-columns: 1fr 1fr 1fr;
+  margin-bottom: 0.85rem;
+}
+
+.actionRow {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+
+/* ── Stats form sub-labels ─────────────────────────────────────────────────── */
+
+.subLabel {
+  color: var(--ahs-text-secondary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin: 0 0 0.5rem;
+  text-transform: uppercase;
+}
+
+.subNote {
+  color: var(--ahs-text-muted);
+  font-size: 0.78rem;
+  margin: -0.35rem 0 0.75rem;
+}
+
+/* ── Danger submit button (archive action) ─────────────────────────────────── */
+
+.archiveBtnDanger {
+  background: var(--ahs-danger);
+  border: 1px solid var(--ahs-danger);
+  border-radius: var(--ahs-radius-sm);
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.45rem 1rem;
+  transition: opacity var(--ahs-transition);
+}
+
+.archiveBtnDanger:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.archiveBtnDanger:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* ── Compact action buttons inside tables ──────────────────────────────────── */
+
+.smallBtn {
+  font-size: 0.78rem;
+  padding: 0.2rem 0.55rem;
+}
+
+.actionCell {
+  white-space: nowrap;
+}
+
+.actionCell > button + button {
+  margin-left: 0.3rem;
+}

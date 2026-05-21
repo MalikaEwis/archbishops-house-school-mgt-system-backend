@@ -11,11 +11,19 @@
 
 /* ── Brand / logo area ───────────────────────────────────────────────────── */
 .brand {
+  align-items: center;
   border-bottom: 1px solid var(--ahs-border-subtle);
   display: flex;
   flex-direction: column;
   gap: 3px;
   padding: 1.25rem 1.25rem 1.1rem;
+}
+
+.logo {
+  display: block;
+  height: 110px;
+  margin-bottom: 0.5rem;
+  width: auto;
 }
 
 .brandShort {

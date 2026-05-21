@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../auth/AuthContext';
-import styles from './Topbar.module.css';
+import { useAuth }     from '../auth/AuthContext';
+import { useTheme }    from '../context/ThemeContext';
+import styles          from './Topbar.module.css';
 
 const ROLE_LABELS = {
   admin_private:       'Private Schools Admin',
@@ -11,8 +12,9 @@ const ROLE_LABELS = {
 };
 
 export default function Topbar() {
-  const { user, logout } = useAuth();
-  const navigate         = useNavigate();
+  const { user, logout }   = useAuth();
+  const { theme, toggleTheme } = useTheme();
+  const navigate           = useNavigate();
 
   async function handleLogout() {
     await logout();
@@ -28,6 +30,14 @@ export default function Topbar() {
         <span className={styles.role}>
           {ROLE_LABELS[user?.role] ?? user?.role}
         </span>
+        <button
+          className={styles.themeToggle}
+          onClick={toggleTheme}
+          aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+        >
+          {theme === 'dark' ? '☀' : '☾'}
+        </button>
         <div className={styles.divider} aria-hidden="true" />
         <button className={styles.logout} onClick={handleLogout}>
           Sign out

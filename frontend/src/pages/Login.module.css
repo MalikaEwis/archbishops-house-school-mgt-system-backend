@@ -8,6 +8,34 @@
   padding: 2rem 1rem;
 }
 
+/* ── Theme toggle — fixed to top-right corner ────────────────────────────── */
+.themeToggle {
+  background: var(--ahs-bg-card);
+  border: 1px solid var(--ahs-border);
+  border-radius: var(--ahs-radius-sm);
+  color: var(--ahs-text-secondary);
+  cursor: pointer;
+  font-size: 0.85rem;
+  line-height: 1;
+  padding: 0.3rem 0.5rem;
+  position: fixed;
+  right: 1.25rem;
+  top: 1.25rem;
+  transition: background var(--ahs-transition), border-color var(--ahs-transition), color var(--ahs-transition);
+  z-index: 10;
+}
+
+.themeToggle:hover {
+  background: var(--ahs-bg-surface);
+  border-color: var(--ahs-text-muted);
+  color: var(--ahs-text-primary);
+}
+
+.themeToggle:focus-visible {
+  outline: 2px solid var(--ahs-border-focus);
+  outline-offset: 2px;
+}
+
 /* ── Authentication card ─────────────────────────────────────────────────── */
 .card {
   background: var(--ahs-bg-card);

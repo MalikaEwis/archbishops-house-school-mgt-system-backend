@@ -3,28 +3,29 @@
 }
 
 .heading {
-  color: #111827;
+  color: var(--ahs-text-primary);
   font-size: 1.5rem;
   font-weight: 700;
   margin: 0 0 0.25rem;
 }
 
 .role {
-  color: #6b7280;
+  color: var(--ahs-orange);
   font-size: 0.9rem;
+  font-weight: 600;
   margin: 0 0 0.5rem;
 }
 
 .meta {
-  color: #6b7280;
+  color: var(--ahs-text-secondary);
   font-size: 0.85rem;
   margin: 0 0 1.5rem;
 }
 
 .placeholder {
-  border: 2px dashed #e5e7eb;
-  border-radius: 8px;
-  color: #9ca3af;
+  border: 2px dashed var(--ahs-orange-border);
+  border-radius: var(--ahs-radius-md);
+  color: var(--ahs-text-muted);
   font-size: 0.9rem;
   margin-top: 1.5rem;
   padding: 3rem 2rem;

@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth, getRoleHome } from '../auth/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import logo from '../assets/logo1.png';
 import styles from './Login.module.css';
 
 export default function Login() {
-  const { user, login } = useAuth();
+  const { user, login }        = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate        = useNavigate();
   const location        = useLocation();
 
@@ -40,6 +42,15 @@ export default function Login() {
 
   return (
     <div className={styles.page}>
+      <button
+        className={styles.themeToggle}
+        onClick={toggleTheme}
+        aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+        title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+      >
+        {theme === 'dark' ? '☀' : '☾'}
+      </button>
+
       <div className={styles.card}>
 
         <div className={styles.logoWrap}>

@@ -1,72 +1,76 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { fetchVestedSchool, createVestedSchool, updateVestedSchool } from '../../api/vestedSchools';
-import styles from '../private/TeacherFormPage.module.css';
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  fetchVestedSchool,
+  createVestedSchool,
+  updateVestedSchool,
+} from "../../api/vestedSchools";
+import styles from "../private/TeacherFormPage.module.css";
 
 const EMPTY_FORM = {
   // Basic Information
-  school_index:               '',
-  school_name:                '',
-  school_category:            '',
-  student_admission_type:     '',
-  medium_of_instruction:      '',
-  school_type_detail:         '',
-  year_established:           '',
-  school_census_no:           '',
-  no_of_students:             '',
-  no_of_teachers:             '',
-  no_of_pensionable_teachers: '',
+  school_index: "",
+  school_name: "",
+  school_category: "",
+  student_admission_type: "",
+  medium_of_instruction: "",
+  school_type_detail: "",
+  year_established: "",
+  school_census_no: "",
+  no_of_students: "",
+  no_of_teachers: "",
+  no_of_pensionable_teachers: "",
   // Location
-  province:                   '',
-  district:                   '',
-  region:                     '',
-  zone:                       '',
-  education_zone:             '',
-  divisional_secretariat:     '',
-  parish:                     '',
-  school_address:             '',
+  province: "",
+  district: "",
+  region: "",
+  zone: "",
+  education_zone: "",
+  divisional_secretariat: "",
+  parish: "",
+  school_address: "",
   // Contact
-  school_phone:               '',
-  school_fax:                 '',
-  school_email:               '',
+  school_phone: "",
+  school_fax: "",
+  school_email: "",
   // BOG Religion Breakdown
-  bog_catholic_pct:           '',
-  bog_other_christian_pct:    '',
-  bog_buddhist_pct:           '',
-  bog_hindu_pct:              '',
-  bog_islam_pct:              '',
-  bog_other_religion_pct:     '',
+  bog_catholic_pct: "",
+  bog_other_christian_pct: "",
+  bog_buddhist_pct: "",
+  bog_hindu_pct: "",
+  bog_islam_pct: "",
+  bog_other_religion_pct: "",
   // Remarks
-  overview_general:           '',
-  overview_remarks:           '',
-  overview_special_notes:     '',
-  overview_challenges:        '',
+  overview_general: "",
+  overview_remarks: "",
+  overview_special_notes: "",
+  overview_challenges: "",
 };
 
 function toStr(val) {
-  if (val == null) return '';
+  if (val == null) return "";
   return String(val);
 }
 
 function strOrNull(val) {
-  return val.trim() === '' ? null : val.trim();
+  return val.trim() === "" ? null : val.trim();
 }
 
 function numOrNull(val) {
-  if (val === '' || val == null) return null;
+  if (val === "" || val == null) return null;
   const n = Number(val);
   return isNaN(n) ? null : n;
 }
 
 export default function VestedSchoolFormPage() {
   const navigate = useNavigate();
-  const { id }   = useParams();
-  const isEdit   = Boolean(id);
+  const { id } = useParams();
+  const isEdit = Boolean(id);
 
-  const [fields,     setFields]     = useState(EMPTY_FORM);
-  const [loading,    setLoading]    = useState(isEdit);
+  const [fields, setFields] = useState(EMPTY_FORM);
+  const [loading, setLoading] = useState(isEdit);
   const [submitting, setSubmitting] = useState(false);
-  const [error,      setError]      = useState('');
+  const [error, setError] = useState("");
 
   // ── Load existing school for edit mode ─────────────────────────────────────
   useEffect(() => {
@@ -75,41 +79,43 @@ export default function VestedSchoolFormPage() {
     fetchVestedSchool(id)
       .then((school) => {
         setFields({
-          school_index:               toStr(school.school_index),
-          school_name:                toStr(school.school_name),
-          school_category:            toStr(school.school_category),
-          student_admission_type:     toStr(school.student_admission_type),
-          medium_of_instruction:      toStr(school.medium_of_instruction),
-          school_type_detail:         toStr(school.school_type_detail),
-          year_established:           toStr(school.year_established),
-          school_census_no:           toStr(school.school_census_no),
-          no_of_students:             toStr(school.no_of_students),
-          no_of_teachers:             toStr(school.no_of_teachers),
+          school_index: toStr(school.school_index),
+          school_name: toStr(school.school_name),
+          school_category: toStr(school.school_category),
+          student_admission_type: toStr(school.student_admission_type),
+          medium_of_instruction: toStr(school.medium_of_instruction),
+          school_type_detail: toStr(school.school_type_detail),
+          year_established: toStr(school.year_established),
+          school_census_no: toStr(school.school_census_no),
+          no_of_students: toStr(school.no_of_students),
+          no_of_teachers: toStr(school.no_of_teachers),
           no_of_pensionable_teachers: toStr(school.no_of_pensionable_teachers),
-          province:                   toStr(school.province),
-          district:                   toStr(school.district),
-          region:                     toStr(school.region),
-          zone:                       toStr(school.zone),
-          education_zone:             toStr(school.education_zone),
-          divisional_secretariat:     toStr(school.divisional_secretariat),
-          parish:                     toStr(school.parish),
-          school_address:             toStr(school.school_address),
-          school_phone:               toStr(school.school_phone),
-          school_fax:                 toStr(school.school_fax),
-          school_email:               toStr(school.school_email),
-          bog_catholic_pct:           toStr(school.bog_catholic_pct),
-          bog_other_christian_pct:    toStr(school.bog_other_christian_pct),
-          bog_buddhist_pct:           toStr(school.bog_buddhist_pct),
-          bog_hindu_pct:              toStr(school.bog_hindu_pct),
-          bog_islam_pct:              toStr(school.bog_islam_pct),
-          bog_other_religion_pct:     toStr(school.bog_other_religion_pct),
-          overview_general:           toStr(school.overview_general),
-          overview_remarks:           toStr(school.overview_remarks),
-          overview_special_notes:     toStr(school.overview_special_notes),
-          overview_challenges:        toStr(school.overview_challenges),
+          province: toStr(school.province),
+          district: toStr(school.district),
+          region: toStr(school.region),
+          zone: toStr(school.zone),
+          education_zone: toStr(school.education_zone),
+          divisional_secretariat: toStr(school.divisional_secretariat),
+          parish: toStr(school.parish),
+          school_address: toStr(school.school_address),
+          school_phone: toStr(school.school_phone),
+          school_fax: toStr(school.school_fax),
+          school_email: toStr(school.school_email),
+          bog_catholic_pct: toStr(school.bog_catholic_pct),
+          bog_other_christian_pct: toStr(school.bog_other_christian_pct),
+          bog_buddhist_pct: toStr(school.bog_buddhist_pct),
+          bog_hindu_pct: toStr(school.bog_hindu_pct),
+          bog_islam_pct: toStr(school.bog_islam_pct),
+          bog_other_religion_pct: toStr(school.bog_other_religion_pct),
+          overview_general: toStr(school.overview_general),
+          overview_remarks: toStr(school.overview_remarks),
+          overview_special_notes: toStr(school.overview_special_notes),
+          overview_challenges: toStr(school.overview_challenges),
         });
       })
-      .catch((err) => setError(err.response?.data?.message ?? 'Failed to load school.'))
+      .catch((err) =>
+        setError(err.response?.data?.message ?? "Failed to load school."),
+      )
       .finally(() => setLoading(false));
   }, [id, isEdit]);
 
@@ -118,48 +124,51 @@ export default function VestedSchoolFormPage() {
     setFields((prev) => ({ ...prev, [name]: value }));
   }
 
-  const canSubmit = !submitting && fields.school_index.trim() && fields.school_name.trim();
+  const canSubmit =
+    !submitting && fields.school_index.trim() && fields.school_name.trim();
 
   // ── Submit ─────────────────────────────────────────────────────────────────
   async function handleSubmit(e) {
     e.preventDefault();
-    setError('');
+    setError("");
     setSubmitting(true);
 
     try {
       const body = {
-        school_index:               fields.school_index.trim(),
-        school_name:                fields.school_name.trim(),
-        school_category:            strOrNull(fields.school_category),
-        student_admission_type:     strOrNull(fields.student_admission_type),
-        medium_of_instruction:      strOrNull(fields.medium_of_instruction),
-        school_type_detail:         strOrNull(fields.school_type_detail),
-        year_established:           numOrNull(fields.year_established),
-        school_census_no:           strOrNull(fields.school_census_no),
-        no_of_students:             numOrNull(fields.no_of_students),
-        no_of_teachers:             numOrNull(fields.no_of_teachers),
-        no_of_pensionable_teachers: numOrNull(fields.no_of_pensionable_teachers),
-        province:                   strOrNull(fields.province),
-        district:                   strOrNull(fields.district),
-        region:                     strOrNull(fields.region),
-        zone:                       strOrNull(fields.zone),
-        education_zone:             strOrNull(fields.education_zone),
-        divisional_secretariat:     strOrNull(fields.divisional_secretariat),
-        parish:                     strOrNull(fields.parish),
-        school_address:             strOrNull(fields.school_address),
-        school_phone:               strOrNull(fields.school_phone),
-        school_fax:                 strOrNull(fields.school_fax),
-        school_email:               strOrNull(fields.school_email),
-        bog_catholic_pct:           numOrNull(fields.bog_catholic_pct),
-        bog_other_christian_pct:    numOrNull(fields.bog_other_christian_pct),
-        bog_buddhist_pct:           numOrNull(fields.bog_buddhist_pct),
-        bog_hindu_pct:              numOrNull(fields.bog_hindu_pct),
-        bog_islam_pct:              numOrNull(fields.bog_islam_pct),
-        bog_other_religion_pct:     numOrNull(fields.bog_other_religion_pct),
-        overview_general:           strOrNull(fields.overview_general),
-        overview_remarks:           strOrNull(fields.overview_remarks),
-        overview_special_notes:     strOrNull(fields.overview_special_notes),
-        overview_challenges:        strOrNull(fields.overview_challenges),
+        school_index: fields.school_index.trim(),
+        school_name: fields.school_name.trim(),
+        school_category: strOrNull(fields.school_category),
+        student_admission_type: strOrNull(fields.student_admission_type),
+        medium_of_instruction: strOrNull(fields.medium_of_instruction),
+        school_type_detail: strOrNull(fields.school_type_detail),
+        year_established: numOrNull(fields.year_established),
+        school_census_no: strOrNull(fields.school_census_no),
+        no_of_students: numOrNull(fields.no_of_students),
+        no_of_teachers: numOrNull(fields.no_of_teachers),
+        no_of_pensionable_teachers: numOrNull(
+          fields.no_of_pensionable_teachers,
+        ),
+        province: strOrNull(fields.province),
+        district: strOrNull(fields.district),
+        region: strOrNull(fields.region),
+        zone: strOrNull(fields.zone),
+        education_zone: strOrNull(fields.education_zone),
+        divisional_secretariat: strOrNull(fields.divisional_secretariat),
+        parish: strOrNull(fields.parish),
+        school_address: strOrNull(fields.school_address),
+        school_phone: strOrNull(fields.school_phone),
+        school_fax: strOrNull(fields.school_fax),
+        school_email: strOrNull(fields.school_email),
+        bog_catholic_pct: numOrNull(fields.bog_catholic_pct),
+        bog_other_christian_pct: numOrNull(fields.bog_other_christian_pct),
+        bog_buddhist_pct: numOrNull(fields.bog_buddhist_pct),
+        bog_hindu_pct: numOrNull(fields.bog_hindu_pct),
+        bog_islam_pct: numOrNull(fields.bog_islam_pct),
+        bog_other_religion_pct: numOrNull(fields.bog_other_religion_pct),
+        overview_general: strOrNull(fields.overview_general),
+        overview_remarks: strOrNull(fields.overview_remarks),
+        overview_special_notes: strOrNull(fields.overview_special_notes),
+        overview_challenges: strOrNull(fields.overview_challenges),
       };
 
       if (isEdit) {
@@ -167,11 +176,12 @@ export default function VestedSchoolFormPage() {
         navigate(`/vested/schools/${id}`);
       } else {
         await createVestedSchool(body);
-        navigate('/vested/schools');
+        navigate("/vested/schools");
       }
     } catch (err) {
       setError(
-        err.response?.data?.message ?? `Failed to ${isEdit ? 'update' : 'create'} school.`,
+        err.response?.data?.message ??
+          `Failed to ${isEdit ? "update" : "create"} school.`,
       );
     } finally {
       setSubmitting(false);
@@ -190,7 +200,7 @@ export default function VestedSchoolFormPage() {
   return (
     <div className={styles.page}>
       <h1 className={styles.heading}>
-        {isEdit ? 'Edit School' : 'Create School'}
+        {isEdit ? "Edit School" : "Create School"}
       </h1>
 
       <form onSubmit={handleSubmit} className={styles.form} noValidate>
@@ -420,7 +430,7 @@ export default function VestedSchoolFormPage() {
               onChange={handleChange}
               disabled={submitting}
               rows={3}
-              style={{ resize: 'vertical' }}
+              style={{ resize: "vertical" }}
             />
           </Field>
         </fieldset>
@@ -465,9 +475,14 @@ export default function VestedSchoolFormPage() {
 
         {/* ── BOG Religion Breakdown ─────────────────────────────────────── */}
         <fieldset className={styles.fieldset}>
-          <legend className={styles.legend}>Board of Governors — Religion Breakdown (%)</legend>
+          <legend className={styles.legend}>
+            Board of Governors — Religion Breakdown (%)
+          </legend>
 
-          <Field label="Catholic %" hint="Percentage of BOG members who are Catholic.">
+          <Field
+            label="Catholic %"
+            hint="Percentage of BOG members who are Catholic."
+          >
             <input
               name="bog_catholic_pct"
               type="number"
@@ -554,7 +569,9 @@ export default function VestedSchoolFormPage() {
 
         {/* ── Overview of School Highlighting ───────────────────────────── */}
         <fieldset className={styles.fieldset}>
-          <legend className={styles.legend}>Overview of School Highlighting</legend>
+          <legend className={styles.legend}>
+            Overview of School Highlighting
+          </legend>
 
           <Field label="Vesting information">
             <textarea
@@ -564,7 +581,7 @@ export default function VestedSchoolFormPage() {
               onChange={handleChange}
               disabled={submitting}
               rows={3}
-              style={{ resize: 'vertical' }}
+              style={{ resize: "vertical" }}
             />
           </Field>
 
@@ -576,7 +593,7 @@ export default function VestedSchoolFormPage() {
               onChange={handleChange}
               disabled={submitting}
               rows={3}
-              style={{ resize: 'vertical' }}
+              style={{ resize: "vertical" }}
             />
           </Field>
 
@@ -588,7 +605,7 @@ export default function VestedSchoolFormPage() {
               onChange={handleChange}
               disabled={submitting}
               rows={3}
-              style={{ resize: 'vertical' }}
+              style={{ resize: "vertical" }}
             />
           </Field>
 
@@ -600,7 +617,7 @@ export default function VestedSchoolFormPage() {
               onChange={handleChange}
               disabled={submitting}
               rows={3}
-              style={{ resize: 'vertical' }}
+              style={{ resize: "vertical" }}
             />
           </Field>
         </fieldset>
@@ -611,7 +628,7 @@ export default function VestedSchoolFormPage() {
             type="button"
             className={styles.cancelBtn}
             onClick={() =>
-              navigate(isEdit ? `/vested/schools/${id}` : '/vested/schools')
+              navigate(isEdit ? `/vested/schools/${id}` : "/vested/schools")
             }
             disabled={submitting}
           >
@@ -623,8 +640,12 @@ export default function VestedSchoolFormPage() {
             disabled={!canSubmit}
           >
             {submitting
-              ? isEdit ? 'Saving…' : 'Creating…'
-              : isEdit ? 'Save Changes' : 'Create School'}
+              ? isEdit
+                ? "Saving…"
+                : "Creating…"
+              : isEdit
+                ? "Save Changes"
+                : "Create School"}
           </button>
         </div>
       </form>

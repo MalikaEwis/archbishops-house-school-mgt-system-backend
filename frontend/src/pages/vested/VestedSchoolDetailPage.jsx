@@ -14,6 +14,7 @@ import { useAuth } from "../../auth/AuthContext";
 import detailStyles from "../private/TeacherDetailPage.module.css";
 import listStyles from "../private/TeacherListPage.module.css";
 import formStyles from "../private/TeacherFormPage.module.css";
+import vestedStyles from "./VestedSchoolDetailPage.module.css";
 
 // ── Empty form templates ──────────────────────────────────────────────────────
 
@@ -73,46 +74,6 @@ function calcRetirementDate(dob) {
   d.setFullYear(d.getFullYear() + 60);
   return d.toISOString().slice(0, 10);
 }
-
-// ── Shared inline-form styles (applied via inline style prop) ─────────────────
-
-const INLINE_FORM = {
-  background: "#f8fafc",
-  border: "1px solid #e2e8f0",
-  borderRadius: "6px",
-  padding: "1rem 1.1rem",
-  marginBottom: "1rem",
-};
-
-const TWO_COL = {
-  display: "grid",
-  gridTemplateColumns: "1fr 1fr",
-  gap: "0.65rem 1rem",
-  marginBottom: "0.85rem",
-};
-
-const THREE_COL = {
-  display: "grid",
-  gridTemplateColumns: "1fr 1fr 1fr",
-  gap: "0.65rem 1rem",
-  marginBottom: "0.85rem",
-};
-
-const ACTION_ROW = {
-  display: "flex",
-  justifyContent: "flex-end",
-  gap: "0.5rem",
-  marginTop: "0.5rem",
-};
-
-const FORM_TITLE = {
-  color: "#374151",
-  fontSize: "0.82rem",
-  fontWeight: "700",
-  letterSpacing: "0.04em",
-  marginBottom: "0.85rem",
-  textTransform: "uppercase",
-};
 
 // ── Main component ────────────────────────────────────────────────────────────
 
@@ -279,7 +240,7 @@ export default function VestedSchoolDetailPage() {
       text: "They will be moved to the principal history and will no longer be the active principal.",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#b91c1c",
+      confirmButtonColor: "#923328",
       cancelButtonColor: "#6b7280",
       confirmButtonText: "Yes, archive",
       cancelButtonText: "Cancel",
@@ -414,7 +375,7 @@ export default function VestedSchoolDetailPage() {
       text: "This cannot be undone.",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#b91c1c",
+      confirmButtonColor: "#923328",
       cancelButtonColor: "#6b7280",
       confirmButtonText: "Yes, delete",
       cancelButtonText: "Cancel",
@@ -498,7 +459,7 @@ export default function VestedSchoolDetailPage() {
       {/* ── Title ────────────────────────────────────────────────────────────── */}
       <div className={detailStyles.titleRow}>
         <h1 className={detailStyles.heading}>{school.school_name}</h1>
-        <span className={detailStyles.badgeActive}>{school.school_index}</span>
+        <span className={vestedStyles.indexBadge}>{school.school_index}</span>
       </div>
 
       {/* ── School Information ────────────────────────────────────────────────── */}
@@ -578,7 +539,7 @@ export default function VestedSchoolDetailPage() {
 
         {/* Admin action buttons — only visible when no inline form is open */}
         {isAdmin && principalMode === null && (
-          <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem" }}>
+          <div className={vestedStyles.adminActions}>
             {currentPrincipal ? (
               <>
                 <button
@@ -607,20 +568,17 @@ export default function VestedSchoolDetailPage() {
 
         {/* ── Add / Edit principal inline form ── */}
         {isAdmin && (principalMode === "add" || principalMode === "edit") && (
-          <div style={INLINE_FORM}>
-            <p style={FORM_TITLE}>
+          <div className={vestedStyles.inlineForm}>
+            <p className={vestedStyles.formTitle}>
               {principalMode === "add" ? "Add Principal" : "Edit Principal"}
             </p>
             {principalError && (
-              <p
-                className={detailStyles.error}
-                style={{ marginBottom: "0.75rem" }}
-              >
+              <p className={`${detailStyles.error} ${vestedStyles.formError}`}>
                 {principalError}
               </p>
             )}
 
-            <div style={TWO_COL}>
+            <div className={vestedStyles.twoCol}>
               <FormField label="Full name *">
                 <input
                   name="full_name"
@@ -783,7 +741,7 @@ export default function VestedSchoolDetailPage() {
               </FormField>
             </div>
 
-            <div style={ACTION_ROW}>
+            <div className={vestedStyles.actionRow}>
               <button
                 className={formStyles.cancelBtn}
                 onClick={cancelPrincipal}
@@ -804,18 +762,15 @@ export default function VestedSchoolDetailPage() {
 
         {/* ── Archive inline form ── */}
         {isAdmin && principalMode === "archive" && (
-          <div style={INLINE_FORM}>
-            <p style={FORM_TITLE}>Archive Current Principal</p>
+          <div className={vestedStyles.inlineForm}>
+            <p className={vestedStyles.formTitle}>Archive Current Principal</p>
             {principalError && (
-              <p
-                className={detailStyles.error}
-                style={{ marginBottom: "0.75rem" }}
-              >
+              <p className={`${detailStyles.error} ${vestedStyles.formError}`}>
                 {principalError}
               </p>
             )}
 
-            <div style={TWO_COL}>
+            <div className={vestedStyles.twoCol}>
               <FormField label="End date">
                 <input
                   name="end_date"
@@ -847,7 +802,7 @@ export default function VestedSchoolDetailPage() {
               </FormField>
             </div>
 
-            <div style={ACTION_ROW}>
+            <div className={vestedStyles.actionRow}>
               <button
                 className={formStyles.cancelBtn}
                 onClick={cancelPrincipal}
@@ -856,8 +811,7 @@ export default function VestedSchoolDetailPage() {
                 Cancel
               </button>
               <button
-                className={formStyles.submitBtn}
-                style={{ background: "#b91c1c", borderColor: "#b91c1c" }}
+                className={vestedStyles.archiveBtnDanger}
                 onClick={saveArchive}
                 disabled={principalSaving}
               >
@@ -934,11 +888,10 @@ export default function VestedSchoolDetailPage() {
                     <td>{fmtDate(p.end_date) ?? <Nil />}</td>
                     <td>{p.departure_reason ?? <Nil />}</td>
                     {isAdmin && !currentPrincipal && (
-                      <td style={{ whiteSpace: "nowrap" }}>
+                      <td className={vestedStyles.actionCell}>
                         {p.id === mostRecentlyArchivedId && (
                           <button
-                            className={detailStyles.editBtn}
-                            style={{ padding: "0.2rem 0.65rem", fontSize: "0.78rem" }}
+                            className={`${detailStyles.editBtn} ${vestedStyles.smallBtn}`}
                             onClick={() => handleRestorePrincipal(p.id)}
                           >
                             Restore as Principal
@@ -960,7 +913,7 @@ export default function VestedSchoolDetailPage() {
 
         {/* Admin action bar */}
         {isAdmin && statsMode === null && (
-          <div style={{ marginBottom: "1rem" }}>
+          <div className={vestedStyles.statsBar}>
             <button className={detailStyles.editBtn} onClick={openAddStats}>
               + Add Year
             </button>
@@ -969,30 +922,27 @@ export default function VestedSchoolDetailPage() {
 
         {/* Delete / non-form error */}
         {statsMode === null && statsError && (
-          <p className={detailStyles.error} style={{ marginBottom: "1rem" }}>
+          <p className={`${detailStyles.error} ${vestedStyles.statsBar}`}>
             {statsError}
           </p>
         )}
 
         {/* ── Stats inline form ── */}
         {isAdmin && statsMode === "form" && (
-          <div style={INLINE_FORM}>
-            <p style={FORM_TITLE}>
+          <div className={vestedStyles.inlineForm}>
+            <p className={vestedStyles.formTitle}>
               {statsEditYear != null
                 ? `Edit Statistics — ${statsEditYear}`
                 : "Add Statistics"}
             </p>
             {statsError && (
-              <p
-                className={detailStyles.error}
-                style={{ marginBottom: "0.75rem" }}
-              >
+              <p className={`${detailStyles.error} ${vestedStyles.formError}`}>
                 {statsError}
               </p>
             )}
 
             {/* Year + Totals row */}
-            <div style={THREE_COL}>
+            <div className={vestedStyles.threeCol}>
               <FormField label="Year *">
                 <input
                   name="stat_year"
@@ -1045,19 +995,8 @@ export default function VestedSchoolDetailPage() {
             </div>
 
             {/* Religion counts */}
-            <p
-              style={{
-                fontSize: "0.78rem",
-                fontWeight: 600,
-                color: "#6b7280",
-                margin: "0 0 0.5rem",
-                textTransform: "uppercase",
-                letterSpacing: "0.04em",
-              }}
-            >
-              Student Religion Counts
-            </p>
-            <div style={THREE_COL}>
+            <p className={vestedStyles.subLabel}>Student Religion Counts</p>
+            <div className={vestedStyles.threeCol}>
               {[
                 ["count_catholic", "Catholic"],
                 ["count_other_christian", "Other Christian"],
@@ -1083,19 +1022,8 @@ export default function VestedSchoolDetailPage() {
             </div>
 
             {/* Medium counts */}
-            <p
-              style={{
-                fontSize: "0.78rem",
-                fontWeight: 600,
-                color: "#6b7280",
-                margin: "0 0 0.5rem",
-                textTransform: "uppercase",
-                letterSpacing: "0.04em",
-              }}
-            >
-              Student Medium Counts
-            </p>
-            <div style={THREE_COL}>
+            <p className={vestedStyles.subLabel}>Student Medium Counts</p>
+            <div className={vestedStyles.threeCol}>
               {[
                 ["count_sinhala_medium", "Sinhala Medium"],
                 ["count_tamil_medium", "Tamil Medium"],
@@ -1117,17 +1045,11 @@ export default function VestedSchoolDetailPage() {
               ))}
             </div>
 
-            <p
-              style={{
-                fontSize: "0.78rem",
-                color: "#6b7280",
-                margin: "-0.35rem 0 0.75rem",
-              }}
-            >
+            <p className={vestedStyles.subNote}>
               Total students is auto-computed from religion counts.
             </p>
 
-            <div style={ACTION_ROW}>
+            <div className={vestedStyles.actionRow}>
               <button
                 className={formStyles.cancelBtn}
                 onClick={cancelStats}
@@ -1201,24 +1123,15 @@ export default function VestedSchoolDetailPage() {
                       {fmtStatPct(st.count_english_medium, st.total_students)}
                     </td>
                     {isAdmin && (
-                      <td style={{ whiteSpace: "nowrap" }}>
+                      <td className={vestedStyles.actionCell}>
                         <button
-                          className={detailStyles.editBtn}
-                          style={{
-                            padding: "0.2rem 0.55rem",
-                            fontSize: "0.78rem",
-                            marginRight: "0.3rem",
-                          }}
+                          className={`${detailStyles.editBtn} ${vestedStyles.smallBtn}`}
                           onClick={() => openEditStats(st)}
                         >
                           Edit
                         </button>
                         <button
-                          className={detailStyles.removalBtn}
-                          style={{
-                            padding: "0.2rem 0.55rem",
-                            fontSize: "0.78rem",
-                          }}
+                          className={`${detailStyles.removalBtn} ${vestedStyles.smallBtn}`}
                           onClick={() => handleDeleteStats(st.stat_year)}
                         >
                           Delete
@@ -1285,7 +1198,7 @@ function fmtRetiring(years) {
 }
 
 function Nil() {
-  return <span style={{ color: "var(--color-text-muted, #94a3b8)" }}>—</span>;
+  return <span className={detailStyles.nil}>—</span>;
 }
 
 // Read-only label/value pair for the definition list grid
